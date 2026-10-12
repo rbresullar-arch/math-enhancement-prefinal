@@ -91,8 +91,15 @@ table.info td:first-child{color:var(--muted);width:42%}
 <section id="sStart" class="wrap">
   <h1>Math Enhancement</h1>
   <p><b>Prefinal Examination</b> · Simple and Compound Interest</p>
+  <div class="card" id="dlCard">
+    <div class="bar"><h2 style="margin:0">Step 1 · Download the exam</h2><span id="dlPill" class="pill">Checking…</span></div>
+    <p class="muted" id="dlMsg">Download while you have internet. After that the exam works with no internet.</p>
+    <button id="bDl" class="btn full">Download exam</button>
+    <button id="bInstall" class="btn2 full hidden" style="margin-top:10px">Install app on this device</button>
+    <p id="iosTip" class="muted hidden" style="margin-top:10px">📱 iPhone/iPad: tap <b>Share</b> <span class="hl">⬆</span> then <b>Add to Home Screen</b>. Open the exam from the new icon.</p>
+  </div>
   <div class="card">
-    <h2>Enter your details</h2>
+    <h2>Step 2 · Enter your details</h2>
     <div class="row">
       <div><label for="fLast">Last Name</label><input id="fLast" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="e.g. Dela Cruz"></div>
       <div><label for="fFirst">First Name</label><input id="fFirst" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="e.g. Juan"></div>
@@ -112,7 +119,7 @@ table.info td:first-child{color:var(--muted);width:42%}
       <button id="bSync" class="btn2">Upload now</button>
     </div>
   </div>
-  <p class="muted">15 items · 5 concept recall + 10 problem solving · Works without internet once opened.</p>
+  <p class="muted">15 items · 5 concept recall (2 pts each) + 10 problem solving (5 pts each) = 60 points.</p>
   <button id="bLast" class="btn2 full hidden" style="margin-bottom:10px">Show my last result QR</button>
   <button id="bTeacher" class="btn2 full" style="margin-bottom:24px">Teacher: Scan result QR</button>
 </section>
@@ -267,6 +274,9 @@ async function unlock(code){
   const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64(BANK.iv)}, key, b64(BANK.ct));
   return JSON.parse(new TextDecoder().decode(pt));
 }
+
+/* ===== points per item type ===== */
+const POINTS = {"Concept": 2, "Problem Solving": 5};
 
 /* ===== practice items (not graded) ===== */
 const TRIAL = { name:"Practice", items:[
@@ -440,11 +450,11 @@ addEventListener("pagehide", () => flag("closed/reloaded app"));
 /* ===== finish & save ===== */
 async function finishReal(){
   const it = BANKDATA.sets[exam.setIndex].items, salt = BANKDATA.keySalt;
-  let score = 0; const marks = [];
+  let score = 0, total = 0, nOk = 0; const marks = [];
   for(let i=0;i<it.length;i++){
-    const a = exam.answers[i];
+    const a = exam.answers[i], pts = POINTS[it[i].type] || 1;
     const ok = a!==null && (await sha(`${salt}|${exam.setIndex}|${i}|${it[i].o[a]}`)) === it[i].k;
-    if(ok) score++; marks.push(ok ? "✓" : "✗");
+    total += pts; if(ok){ score += pts; nOk++; } marks.push(ok ? "✓" : "✗");
   }
   const t1 = new Date(exam.started), t2 = new Date();
   const s = exam.student;
@@ -453,7 +463,7 @@ async function finishReal(){
     name: s.name,
     flags: (exam.flags||[]).length,
     flagDetails: (exam.flags||[]).map(f=>`${f.t} ${f.k}`).join("; "),
-    set: exam.setName, score, total: it.length, percent: Math.round(score/it.length*1000)/10,
+    set: exam.setName, score, total, percent: Math.round(score/total*1000)/10, correct: `${nOk}/${it.length}`,
     timeStarted: fmtTime(t1), timeEnded: fmtTime(t2), duration: fmtDur(t2-t1),
     answers: exam.answers.map((a,i)=>`${i+1}:${a===null?"-":"ABCD"[a]}`).join(" "),
     marks: marks.join(""),
@@ -463,7 +473,7 @@ async function finishReal(){
   const packed = await packRecord(rec);
   const done = ls.get(LS_DONE, []); done.push(Object.assign({qr:packed}, rec)); ls.set(LS_DONE, done.slice(-200));
   ls.del(LS_ACTIVE);
-  $("rScore").textContent = `${score} / ${it.length}`;
+  $("rScore").textContent = `${score} / ${total}`;
   $("rName").textContent = s.name; $("rSet").textContent = exam.setName; $("rFlags").textContent = rec.flags;
   drawResultQR(packed);
   $("rDate").textContent = rec.date; $("rT1").textContent = rec.timeStarted; $("rT2").textContent = rec.timeEnded; $("rDur").textContent = rec.duration;
@@ -584,9 +594,50 @@ addEventListener("offline", refreshStatus);
 document.addEventListener("visibilitychange", () => { if(!document.hidden) syncNow(); });
 setInterval(syncNow, 60000);
 
+/* ===== download for offline + install ===== */
+const APP_FILES = ["./", "index.html", "config.js", "bank.enc.js", "manifest.json", "icon-180.png", "icon-192.png", "icon-512.png", "qrcode.js", "jsQR.js"];
+async function appCache(){ const ks = await caches.keys(); const k = ks.filter(x=>x.startsWith("me-prefinal-")).sort().pop(); return k ? caches.open(k) : null; }
+async function checkDownloaded(){
+  const pill = $("dlPill");
+  try{
+    const c = await appCache(); let have = 0;
+    if(c) for(const f of APP_FILES) if(await c.match(f, {ignoreSearch:true})) have++;
+    const ok = have === APP_FILES.length;
+    pill.className = "pill " + (ok ? "ok" : "warn"); pill.textContent = ok ? "Ready offline ✓" : "Not downloaded";
+    $("bDl").textContent = ok ? "Download again (update)" : "Download exam";
+    $("bDl").className = ok ? "btn2 full" : "btn full";
+    $("dlMsg").textContent = ok ? "The exam is saved on this device. You can take it with no internet." : "Download while you have internet. After that the exam works with no internet.";
+    return ok;
+  }catch(e){ pill.className="pill warn"; pill.textContent="Not supported"; $("dlMsg").textContent="This browser cannot save the exam. Use Safari (iPhone) or Chrome."; return false; }
+}
+$("bDl").onclick = async () => {
+  if(!navigator.onLine){ $("dlMsg").textContent = "No internet. Connect first, then tap Download."; return; }
+  const b = $("bDl"); b.disabled = true; b.textContent = "Downloading…";
+  try{
+    const reg = await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready;
+    try{ await reg.update(); }catch(e){}
+    const ks = await caches.keys(); const name = ks.filter(x=>x.startsWith("me-prefinal-")).sort().pop() || "me-prefinal-manual";
+    const c = await caches.open(name);
+    for(const f of APP_FILES){ const r = await fetch(f, {cache:"reload"}); if(!r.ok) throw new Error(f); await c.put(f, r); }
+    if(navigator.storage && navigator.storage.persist) try{ await navigator.storage.persist(); }catch(e){}
+  }catch(e){ $("dlMsg").textContent = "Download failed. Check the internet and try again."; }
+  b.disabled = false; await checkDownloaded();
+};
+let installEvt = null;
+addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; $("bInstall").classList.remove("hidden"); });
+$("bInstall").onclick = async () => { if(!installEvt) return; installEvt.prompt(); await installEvt.userChoice; installEvt = null; $("bInstall").classList.add("hidden"); };
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+if(isIOS && !standalone) $("iosTip").classList.remove("hidden");
+addEventListener("appinstalled", () => $("bInstall").classList.add("hidden"));
+
 /* ===== boot ===== */
 refreshStatus(); syncNow();
-if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js").then(() => navigator.serviceWorker.ready).then(checkDownloaded).catch(checkDownloaded);
+  // new version installed: refresh only while on the start screen
+  navigator.serviceWorker.addEventListener("controllerchange", () => { if(!$("sStart").classList.contains("hidden") && !$("fLast").value) location.reload(); else checkDownloaded(); });
+} else checkDownloaded();
 </script>
 </body>
 </html>
