@@ -1,21 +1,14 @@
-# Math Enhancement – Prefinal Examination (PWA)
+# Prefinal Examination (offline-ready web app)
 
-Simple and Compound Interest · 15 items (5 concept recall + 10 problem solving) · 5 sets, assigned at random.
+**Students**
+1. Open the site → type Last Name and First Name.
+2. Tap **Download** on the exam while online (iPhone: also Share → Add to Home Screen).
+3. Tap **Take exam** → type the exam code from the teacher.
+4. Optional practice, then the exam. It submits by itself when time is up.
 
-## Students
-1. Open the site in Safari/Chrome → **Add to Home Screen** (iPhone: Share → Add to Home Screen).
-2. Enter **Last Name** and **First Name** (saved as "Last, First").
-3. Enter the **Exam Code** from the teacher.
-4. Do the practice guide, then the real exam.
-5. Show the **Result QR** to the teacher.
+**Rules**
+- Each session code works for 1 hour 30 minutes after it is first used.
+- One attempt per student. Results go to Google Sheets (queued on the phone when offline).
+- Flags (leaving the app, copy/paste, etc.) are logged only.
 
-## Offline
-- Opened once online → works fully offline afterward.
-- Results queue on the device and upload to Google Sheets when the app is opened online.
-- Teacher can also scan Result QRs (Teacher: Scan result QR) on any device; scans upload when online.
-
-## Flags (logged only, no deduction)
-Leaving the app/switching tabs, losing focus, copy/cut/paste, right-click/long-press, closing/reloading during the real exam.
-
-## Security
-Question bank and answer key are AES-256-GCM encrypted (`bank.enc.js`); answers are stored only as salted hashes.
+**Adding an exam:** add an entry to `EXAMS` in `config.js` and its encrypted bank in `/exams`.
