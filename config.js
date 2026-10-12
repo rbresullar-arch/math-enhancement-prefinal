@@ -1,2 +1,2 @@
-// Google Apps Script web app URL (results upload)
-const API_URL = "https://script.google.com/macros/s/AKfycbwhFMUT_PSQEWCg_jrqHWmWRl9Z92xFf5w2_jfJuAB3zr0RYmt1lWk6fWpc_WI7z-nXmA/exec";
+// Google Apps Script web app URL (results upload) - owner: gericabalangue@sec.edu.ph
+const API_URL = "https://script.google.com/macros/s/AKfycbyiqxFMAFSW4ni5WNmBnz2YpBIqmfMRLOOLfw-DAWEVodnELaIT_KLiQqoAdtw-_82FTg/exec";
