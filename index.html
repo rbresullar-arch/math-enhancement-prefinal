@@ -263,6 +263,26 @@ async function goHome(){
     box.appendChild(el);
   }
   refreshStatus(); show("sHome");
+  pullDone();
+}
+/* scores submitted on other devices (same name) */
+let pulling = false;
+async function pullDone(){
+  if(pulling || !NAME || !navigator.onLine || !API_URL.startsWith("https://")) return;
+  pulling = true;
+  try{
+    const ctl = new AbortController(); setTimeout(() => ctl.abort(), 8000);
+    const j = await (await fetch(`${API_URL}?action=status&name=${encodeURIComponent(NAME)}`, {signal:ctl.signal})).json();
+    if(j && j.ok && j.done){
+      const done = ls.get(K.done, {}); let changed = false;
+      for(const [id, d] of Object.entries(j.done)){
+        if(!examById(id) || done[nkey(id,NAME)]) continue;
+        done[nkey(id,NAME)] = {score:d.score, total:d.total, at:Date.now()}; changed = true;
+      }
+      if(changed){ ls.set(K.done, done); if(!$("sHome").classList.contains("hidden")){ pulling = false; return goHome(); } }
+    }
+  }catch(x){}
+  pulling = false;
 }
 async function download(e){
   if(!navigator.onLine){ alertBox("No internet", "Connect to the internet first, then tap Download."); return false; }
