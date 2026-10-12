@@ -1,6 +1,6 @@
 {
-  "name": "Math Enhancement Prefinal Exam",
-  "short_name": "Math Exam",
+  "name": "Prefinal Examination",
+  "short_name": "Prefinal Exam",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
