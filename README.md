@@ -7,8 +7,10 @@
 4. Optional practice, then the exam. It submits by itself when time is up.
 
 **Rules**
-- Each session code works for 1 hour 30 minutes after it is first used.
+- Each session code works for the exam's time (`minutes` in `config.js`, default 90) after it is first used.
 - One attempt per student. Results go to Google Sheets (queued on the phone when offline).
 - Flags (leaving the app, copy/paste, etc.) are logged only.
 
 **Adding an exam:** add an entry to `EXAMS` in `config.js` and its encrypted bank in `/exams`.
+Optional fields: `minutes` (time limit), `shuffle: true` (per-student question + choice order), `rules` (shown before the exam).
+Codes not listed in the Apps Script `CODES` are accepted by the bank and timed on the device.
