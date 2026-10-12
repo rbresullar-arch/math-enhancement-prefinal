@@ -3,641 +3,544 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Math Enhancement Prefinal</title>
+<title>Prefinal Examination</title>
 <meta name="theme-color" content="#d63384">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Math Exam">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Prefinal Exam">
 <style>
 :root{
-  --pink:#d63384; --pink-dark:#a61e64; --pink-soft:#fde4f0; --pink-line:#f5b8d4;
-  --bg:#fff7fb; --card:#ffffff; --ink:#2b1a24; --muted:#7a5c6c;
-  --ok:#1f8a4c; --ok-soft:#e3f6ea; --warn:#b26b00; --warn-soft:#fff3d6; --bad:#c0392b;
-  --r:14px;
+  --pink:#d63384; --pink-dark:#a61e64; --pink-soft:#fde4f0; --line:#f3c4d9;
+  --bg:#fff7fb; --ink:#2b1a24; --muted:#7a5c6c;
+  --ok:#1f8a4c; --ok-soft:#e3f6ea; --warn:#9a5b00; --warn-soft:#fff3d6; --bad:#c0392b;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
 body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-.wrap{max-width:720px;margin:0 auto;padding:16px}
-h1{font-size:1.5rem;margin:.2em 0;color:var(--pink-dark)}
-h2{font-size:1.2rem;margin:.2em 0 .6em;color:var(--pink-dark)}
+.wrap{max-width:640px;margin:0 auto;padding:20px 16px 32px}
+h1{font-size:1.35rem;letter-spacing:.06em;margin:0;color:var(--pink-dark)}
+h2{font-size:1.15rem;margin:0 0 .5em;color:var(--pink-dark)}
 p{margin:.4em 0}
-.card{background:var(--card);border:1px solid var(--pink-line);border-radius:var(--r);padding:18px;margin:12px 0}
+.sub{color:var(--muted);margin:2px 0 18px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin:12px 0}
 .muted{color:var(--muted);font-size:.92rem}
 label{display:block;font-weight:600;margin:12px 0 4px}
-input{width:100%;font:inherit;padding:12px 14px;border:2px solid var(--pink-line);border-radius:10px;background:#fff;color:var(--ink)}
+input{width:100%;font:inherit;padding:12px 14px;border:2px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
 input:focus{outline:none;border-color:var(--pink)}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-.row>*{flex:1 1 180px}
-button{font:inherit;font-weight:600;border:0;border-radius:12px;padding:13px 18px;cursor:pointer;min-height:48px}
+button{font:inherit;font-weight:600;border:0;border-radius:12px;padding:12px 18px;cursor:pointer;min-height:48px}
 .btn{background:var(--pink);color:#fff}
 .btn:active{background:var(--pink-dark)}
 .btn2{background:#fff;color:var(--pink-dark);border:2px solid var(--pink)}
-.btn:disabled,.btn2:disabled{opacity:.4;cursor:not-allowed}
+button:disabled{opacity:.45;cursor:not-allowed}
 .full{width:100%}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
 .err{color:var(--bad);font-weight:600;min-height:1.4em;margin-top:8px}
-.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:.92rem}
-.pill{display:inline-block;padding:3px 10px;border-radius:99px;background:var(--pink-soft);color:var(--pink-dark);font-weight:600;font-size:.85rem}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;background:var(--pink-soft);color:var(--pink-dark);font-weight:600;font-size:.82rem;white-space:nowrap}
 .pill.ok{background:var(--ok-soft);color:var(--ok)}
 .pill.warn{background:var(--warn-soft);color:var(--warn)}
 .hidden{display:none!important}
-
+.link{background:none;border:0;color:var(--pink-dark);text-decoration:underline;padding:0;min-height:0;font-weight:500}
+.exam h2{margin:0}
+.exam .actions{display:flex;gap:10px;margin-top:14px}
+.exam .actions button{flex:1}
+.status{font-size:.9rem;color:var(--muted);text-align:center;margin-top:18px}
 /* exam */
-.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--pink-line)}
-.qnum{font-weight:700;color:var(--pink-dark)}
-.qtype{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
-.qtext{font-size:1.15rem;margin:8px 0 14px}
-.choice{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;background:#fff;border:2px solid var(--pink-line);color:var(--ink);font-weight:500;margin:8px 0;padding:14px}
-.choice .ltr{flex:0 0 34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--pink-soft);color:var(--pink-dark);font-weight:700}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line)}
+.timer{font-variant-numeric:tabular-nums;font-weight:700}
+.timer.low{color:var(--bad)}
+.qtype{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.qtext{font-size:1.12rem;margin:8px 0 12px}
+.choice{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;background:#fff;border:2px solid var(--line);color:var(--ink);font-weight:500;margin:8px 0;padding:13px}
+.choice .ltr{flex:0 0 32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--pink-soft);color:var(--pink-dark);font-weight:700}
 .choice.sel{border-color:var(--pink);background:var(--pink-soft)}
 .choice.sel .ltr{background:var(--pink);color:#fff}
-.nav{display:flex;gap:10px;margin-top:14px}
+.nav{display:flex;gap:10px;margin-top:12px}
 .nav button{flex:1}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:8px}
-.grid button{padding:0;min-height:44px;background:#fff;border:2px solid var(--pink-line);color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:8px}
+.grid button{padding:0;min-height:42px;background:#fff;border:2px solid var(--line);color:var(--ink)}
 .grid button.ans{background:var(--pink);border-color:var(--pink);color:#fff}
 .grid button.cur{outline:3px solid var(--pink-dark);outline-offset:2px}
-.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin-top:10px}
-.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:4px;border:2px solid var(--pink-line);background:#fff}
-.legend i.a{background:var(--pink);border-color:var(--pink)}
-
-/* modal */
 .modal{position:fixed;inset:0;background:rgba(43,26,36,.55);display:grid;place-items:center;padding:16px;z-index:50}
-.modal .card{max-width:440px;width:100%}
-
-/* tutorial coach marks */
-#coach{position:fixed;inset:0;z-index:40;pointer-events:none}
-#coach .block{position:fixed;inset:0;pointer-events:auto}
-.coach-lift{position:relative;z-index:41}
-#coach .ring{position:fixed;border:4px solid #ffd43b;border-radius:14px;box-shadow:0 0 0 9999px rgba(43,26,36,.62);transition:all .25s ease;pointer-events:none}
-#coach .tip{position:fixed;left:16px;right:16px;max-width:520px;margin:0 auto;background:#fff;border:3px solid var(--pink);border-radius:16px;padding:16px;pointer-events:auto;box-shadow:0 8px 30px rgba(0,0,0,.25)}
-#coach .tip .step{font-size:.8rem;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:.05em}
-#coach .tip .say{font-size:1.1rem;margin:6px 0 12px}
-#coach .tip .act{display:flex;gap:8px}
-#coach .tip .act button{flex:1}
-.hl{background:#fff3a8;padding:0 4px;border-radius:4px;font-weight:700}
+.modal .card{max-width:420px;width:100%}
 .big{font-size:2.6rem;font-weight:800;color:var(--pink-dark);margin:.1em 0}
 table.info{width:100%;border-collapse:collapse;font-size:.95rem}
 table.info td{padding:6px 0;border-bottom:1px solid var(--pink-soft)}
 table.info td:first-child{color:var(--muted);width:42%}
+.hl{background:#fff3a8;padding:0 4px;border-radius:4px;font-weight:700}
+/* practice guide */
+#coach{position:fixed;inset:0;z-index:40;pointer-events:none}
+#coach .block{position:fixed;inset:0;pointer-events:auto}
+.coach-lift{position:relative;z-index:41}
+#coach .ring{position:fixed;border:4px solid #ffd43b;border-radius:14px;box-shadow:0 0 0 9999px rgba(43,26,36,.6);transition:all .2s ease;pointer-events:none}
+#coach .tip{position:fixed;left:16px;right:16px;max-width:500px;margin:0 auto;background:#fff;border:3px solid var(--pink);border-radius:16px;padding:14px 16px;pointer-events:auto;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+#coach .step{font-size:.78rem;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:.05em}
+#coach .say{font-size:1.05rem;margin:6px 0 12px}
+#coach .act{display:flex;gap:8px;align-items:center}
+#coach .act .btn{flex:1}
 </style>
 </head>
 <body>
 
-<!-- ============ START ============ -->
-<section id="sStart" class="wrap">
-  <h1>Math Enhancement</h1>
-  <p><b>Prefinal Examination</b> · Simple and Compound Interest</p>
-  <div class="card" id="dlCard">
-    <div class="bar"><h2 style="margin:0">Step 1 · Download the exam</h2><span id="dlPill" class="pill">Checking…</span></div>
-    <p class="muted" id="dlMsg">Download while you have internet. After that the exam works with no internet.</p>
-    <button id="bDl" class="btn full">Download exam</button>
-    <button id="bInstall" class="btn2 full hidden" style="margin-top:10px">Install app on this device</button>
-    <p id="iosTip" class="muted hidden" style="margin-top:10px">📱 iPhone/iPad: tap <b>Share</b> <span class="hl">⬆</span> then <b>Add to Home Screen</b>. Open the exam from the new icon.</p>
-  </div>
+<!-- 1. NAME -->
+<section id="sName" class="wrap">
+  <h1>PREFINAL EXAMINATION</h1>
+  <p class="sub">Type your name to begin.</p>
   <div class="card">
-    <h2>Step 2 · Enter your details</h2>
     <div class="row">
-      <div><label for="fLast">Last Name</label><input id="fLast" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="e.g. Dela Cruz"></div>
-      <div><label for="fFirst">First Name</label><input id="fFirst" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="e.g. Juan"></div>
+      <div><label for="fLast">Last Name</label><input id="fLast" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="Dela Cruz"></div>
+      <div><label for="fFirst">First Name</label><input id="fFirst" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="Juan"></div>
     </div>
-    <label for="fCode">Exam Code <span class="muted">(given by your teacher)</span></label>
-    <input id="fCode" type="password" placeholder="Exam code" autocomplete="off" autocapitalize="off" spellcheck="false">
-    <div id="startErr" class="err"></div>
-    <button id="bStart" class="btn full">Continue</button>
-  </div>
-  <div class="card">
-    <div class="bar">
-      <span>Results waiting to upload: <b id="pendN">0</b></span>
-      <span id="netPill" class="pill">…</span>
-    </div>
-    <div class="bar" style="margin-top:10px">
-      <span id="syncMsg" class="muted"></span>
-      <button id="bSync" class="btn2">Upload now</button>
-    </div>
-  </div>
-  <p class="muted">15 items · 5 concept recall (2 pts each) + 10 problem solving (5 pts each) = 60 points.</p>
-  <button id="bLast" class="btn2 full hidden" style="margin-bottom:10px">Show my last result QR</button>
-  <button id="bTeacher" class="btn2 full" style="margin-bottom:24px">Teacher: Scan result QR</button>
-</section>
-
-<!-- ============ TRIAL INTRO ============ -->
-<section id="sTrialIntro" class="wrap hidden">
-  <h1>Let's practice first!</h1>
-  <div class="card">
-    <p>Hi <b id="hiName"></b>! Before the real exam, you will try a <span class="hl">practice test</span> with 3 easy questions.</p>
-    <p>A yellow box will show you <b>where to look</b> and <b>what to tap</b>. Just follow it.</p>
-    <p>The practice test is <b>not graded</b>.</p>
-    <button id="bTrial" class="btn full" style="margin-top:10px">Start Practice</button>
-    <button id="bSkipTrial" class="btn2 full" style="margin-top:10px">I already know how — skip</button>
+    <div id="nameErr" class="err"></div>
+    <button id="bName" class="btn full">Continue</button>
   </div>
 </section>
 
-<!-- ============ EXAM (used for trial and real) ============ -->
+<!-- 2. HOME -->
+<section id="sHome" class="wrap hidden">
+  <h1>PREFINAL EXAMINATION</h1>
+  <p class="sub">Hi, <b id="hiName"></b> · <button id="bNotMe" class="link">not you?</button></p>
+  <div id="examList"></div>
+  <div class="card hidden" id="iosTip"><p class="muted">📱 <b>iPhone/iPad:</b> tap <b>Share</b> then <b>Add to Home Screen</b>, and open the exam from the new icon. This keeps it saved for offline use.</p></div>
+  <button id="bInstall" class="btn2 full hidden">Install app on this device</button>
+  <div class="status"><span id="netPill" class="pill">…</span> <span id="queueMsg"></span> <button id="bSync" class="link hidden">Upload now</button></div>
+</section>
+
+<!-- 3. CODE -->
+<section id="sCode" class="wrap hidden">
+  <h1 id="codeTitle"></h1>
+  <p class="sub" id="codeTopic"></p>
+  <div class="card">
+    <label for="fCode">Exam Code</label>
+    <input id="fCode" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Given by your teacher" style="text-transform:uppercase;letter-spacing:.08em">
+    <p class="muted">The code works for 1 hour 30 minutes after it is first used. You can take this exam only once.</p>
+    <div id="codeErr" class="err"></div>
+    <button id="bCode" class="btn full">Start</button>
+    <button id="bCodeBack" class="btn2 full" style="margin-top:10px">Back</button>
+  </div>
+</section>
+
+<!-- 4. READY -->
+<section id="sReady" class="wrap hidden">
+  <h1 id="readyTitle"></h1>
+  <div class="card">
+    <table class="info">
+      <tr><td>Items</td><td id="readyItems"></td></tr>
+      <tr><td>Time left</td><td id="readyTime"></td></tr>
+    </table>
+    <p style="margin-top:12px">First time? Try the <span class="hl">practice</span> (3 easy questions, not graded). A yellow box shows you what to tap.</p>
+    <button id="bPractice" class="btn2 full" style="margin-top:8px">Practice first</button>
+    <button id="bStartReal" class="btn full" style="margin-top:10px">Start the exam</button>
+    <p class="muted" style="margin-top:10px">The time is already running. The exam submits by itself when time is up.</p>
+  </div>
+</section>
+
+<!-- 5. EXAM -->
 <section id="sExam" class="wrap hidden">
   <div class="top">
-    <div class="bar">
-      <span id="exTitle" class="pill">Set A</span>
-      <span id="exWho" class="muted"></span>
-    </div>
-    <div class="bar" style="margin-top:6px">
-      <span id="exProg" class="muted">Answered 0 of 15</span>
-      <span class="muted">Started <b id="exStart"></b></span>
-    </div>
+    <div class="bar"><span id="exTitle" class="pill"></span><span class="timer" id="exTimer"></span></div>
+    <div class="bar muted" style="margin-top:4px"><span id="exProg"></span><span id="exWho"></span></div>
   </div>
-
   <div id="qCard" class="card">
-    <div class="bar"><span id="qNum" class="qnum">Question 1 of 15</span><span id="qType" class="qtype"></span></div>
+    <div class="bar"><b id="qNum"></b><span id="qType" class="qtype"></span></div>
     <div id="qText" class="qtext"></div>
     <div id="choices"></div>
-    <div class="nav">
-      <button id="bPrev" class="btn2">◀ Back</button>
-      <button id="bNext" class="btn">Next ▶</button>
-    </div>
+    <div class="nav"><button id="bPrev" class="btn2">◀ Back</button><button id="bNext" class="btn">Next ▶</button></div>
   </div>
-
   <div id="gridCard" class="card">
-    <h2 style="font-size:1rem">Jump to a question</h2>
+    <div class="bar" style="margin-bottom:8px"><b style="font-size:.95rem">Questions</b><span class="muted" style="font-size:.85rem">pink = answered</span></div>
     <div id="grid" class="grid"></div>
-    <div class="legend"><span><i class="a"></i>Answered</span><span><i></i>Not yet answered</span></div>
   </div>
-
-  <button id="bSubmit" class="btn full" style="margin-bottom:24px">Submit Exam</button>
+  <button id="bSubmit" class="btn full">Submit</button>
 </section>
 
-<!-- ============ TRIAL DONE ============ -->
-<section id="sTrialDone" class="wrap hidden">
+<!-- 6. PRACTICE DONE -->
+<section id="sPracticeDone" class="wrap hidden">
   <h1>Great job! 🎉</h1>
   <div class="card">
-    <p>You finished the practice. Remember:</p>
-    <p>1. <span class="hl">Read</span> the question.<br>2. <span class="hl">Tap</span> one answer — it turns pink.<br>3. Tap <span class="hl">Next ▶</span>.<br>4. When all boxes are pink, tap <span class="hl">Submit Exam</span>.</p>
-    <p>You can change an answer anytime <b>before</b> you submit.</p>
-    <button id="bTrialAgain" class="btn2 full" style="margin-top:10px">Practice again</button>
-    <button id="bReal" class="btn full" style="margin-top:10px">Start the REAL Exam</button>
-    <p class="muted" style="margin-top:10px">Your time starts when you tap "Start the REAL Exam".</p>
+    <p>1. <span class="hl">Read</span> the question.<br>2. <span class="hl">Tap</span> an answer (it turns pink).<br>3. Tap <span class="hl">Next ▶</span>.<br>4. When all boxes are pink, tap <span class="hl">Submit</span>.</p>
+    <button id="bPracticeAgain" class="btn2 full" style="margin-top:10px">Practice again</button>
+    <button id="bStartReal2" class="btn full" style="margin-top:10px">Start the exam</button>
   </div>
 </section>
 
-<!-- ============ RESULT ============ -->
+<!-- 7. RESULT -->
 <section id="sResult" class="wrap hidden">
-  <h1>Exam submitted</h1>
+  <h1>Submitted</h1>
   <div class="card" style="text-align:center">
     <div class="muted">Your score</div>
-    <div class="big" id="rScore">0 / 15</div>
-    <div id="rUp" class="pill">…</div>
-  </div>
-  <div class="card" style="text-align:center">
-    <h2 style="margin-bottom:4px">Result QR</h2>
-    <p class="muted" style="margin-top:0">Show this to your teacher to scan.</p>
-    <div id="rQR" style="display:inline-block;background:#fff;padding:10px;border-radius:10px;border:1px solid var(--pink-line)"></div>
+    <div class="big" id="rScore"></div>
+    <span id="rUp" class="pill"></span>
   </div>
   <div class="card">
     <table class="info">
       <tr><td>Name</td><td id="rName"></td></tr>
-      <tr><td>Flags</td><td id="rFlags"></td></tr>
+      <tr><td>Exam</td><td id="rExam"></td></tr>
       <tr><td>Set</td><td id="rSet"></td></tr>
       <tr><td>Date</td><td id="rDate"></td></tr>
-      <tr><td>Time started</td><td id="rT1"></td></tr>
-      <tr><td>Time ended</td><td id="rT2"></td></tr>
-      <tr><td>Time used</td><td id="rDur"></td></tr>
+      <tr><td>Started</td><td id="rT1"></td></tr>
+      <tr><td>Ended</td><td id="rT2"></td></tr>
     </table>
-    <p class="muted" style="margin-top:10px">Show this screen to your teacher. If there is no internet, your result is saved on this device and uploads automatically next time the app is opened online.</p>
+    <p class="muted" style="margin-top:10px">No internet? Your result is saved on this phone and uploads by itself the next time you open the app online.</p>
   </div>
   <button id="bDone" class="btn2 full">Done</button>
 </section>
 
-<!-- ============ TEACHER SCAN ============ -->
-<section id="sTeacher" class="wrap hidden">
-  <h1>Scan result QR</h1>
-  <div class="card">
-    <label for="tCode">Exam Code</label>
-    <input id="tCode" type="password" autocomplete="off" autocapitalize="off" spellcheck="false">
-    <div id="tErr" class="err"></div>
-    <button id="tStart" class="btn full">Open camera</button>
-    <div id="tCam" class="hidden">
-      <video id="tVideo" muted playsinline style="width:100%;border-radius:12px;background:#000;margin-top:8px"></video>
-      <canvas id="tCanvas" class="hidden"></canvas>
-      <p class="muted">Point the camera at a student's Result QR. Each scan is saved and uploaded when online.</p>
-    </div>
-  </div>
-  <div class="card">
-    <div class="bar"><b>Scanned</b><span class="muted">Waiting to upload: <b id="tCount">0</b></span></div>
-    <div id="tLog"></div>
-  </div>
-  <button id="tBack" class="btn2 full" style="margin-bottom:24px">Back</button>
-</section>
-
-<!-- modal -->
 <div id="modal" class="modal hidden"><div class="card"><h2 id="mTitle"></h2><div id="mBody"></div>
   <div class="nav"><button id="mNo" class="btn2">Go back</button><button id="mYes" class="btn">Yes, submit</button></div></div></div>
 
-<!-- coach -->
 <div id="coach" class="hidden"><div class="block"></div><div class="ring"></div><div class="tip"><div class="step"></div><div class="say"></div><div class="act"></div></div></div>
 
 <script src="config.js"></script>
-<script src="bank.enc.js"></script>
-<script src="qrcode.js"></script>
-<script src="jsQR.js"></script>
 <script>
 "use strict";
-/* ===== CONFIG ===== */
-const LS_QUEUE = "me_pf_queue", LS_ACTIVE = "me_pf_active", LS_DONE = "me_pf_done";
-
-/* ===== helpers ===== */
+/* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
 const show = id => { document.querySelectorAll("body>section").forEach(s => s.classList.add("hidden")); $(id).classList.remove("hidden"); scrollTo(0,0); };
 const ls = {
-  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
-  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} },
+  get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} },
   del(k){ try{ localStorage.removeItem(k); }catch(e){} }
 };
+const K = { name:"pf_name", queue:"pf_queue", active:"pf_active", done:"pf_done", codes:"pf_codes" };
 const pad = n => String(n).padStart(2,"0");
 const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const fmtTime = d => { let h=d.getHours(), ap=h<12?"AM":"PM"; h=h%12||12; return `${h}:${pad(d.getMinutes())}:${pad(d.getSeconds())} ${ap}`; };
-const fmtDur = ms => { const s=Math.round(ms/1000); return `${Math.floor(s/60)} min ${s%60} sec`; };
+const fmtLeft = ms => { const s=Math.max(0,Math.floor(ms/1000)); return `${Math.floor(s/60)}:${pad(s%60)}`; };
 const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
-const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2));
+const uid = () => crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-async function sha(t){ const h = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)); return btoa(String.fromCharCode(...new Uint8Array(h))); }
+const cleanName = v => v.trim().replace(/\s+/g," ").replace(/[^\p{L}\p{M} .'\-]/gu,"");
+const titleCase = v => v.toLowerCase().replace(/(^|[\s\-'])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
+const nkey = (exam,name) => exam+"|"+name.toLowerCase();
+async function sha(t){ const h=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)); return btoa(String.fromCharCode(...new Uint8Array(h))); }
+const examById = id => EXAMS.find(e => e.id===id);
 
-/* ===== names ===== */
-const cleanName = v => v.trim().replace(/\s+/g," ").replace(/[^\p{L}\p{M} .'\-ñÑ]/gu,"");
-const titleCase = v => v.toLowerCase().replace(/(^|[\s\-'])(\p{L})/gu, (m,a,b)=>a+b.toUpperCase());
+/* ---------- state ---------- */
+let NAME = ls.get(K.name, ""), EXAM = null, BANKDATA = null, att = null, mode = "real", cur = 0, timerId = null;
 
-/* ===== decrypt bank ===== */
-async function unlock(code){
-  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(code), "PBKDF2", false, ["deriveKey"]);
-  const key = await crypto.subtle.deriveKey({name:"PBKDF2", salt:b64(BANK.salt), iterations:BANK.iter, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["decrypt"]);
-  const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64(BANK.iv)}, key, b64(BANK.ct));
-  return JSON.parse(new TextDecoder().decode(pt));
+/* ---------- 1. name ---------- */
+$("bName").onclick = () => {
+  const L=titleCase(cleanName($("fLast").value)), F=titleCase(cleanName($("fFirst").value));
+  if(L.length<2 || F.length<2){ $("nameErr").textContent = "Please type your Last Name and First Name."; return; }
+  NAME = `${L}, ${F}`; ls.set(K.name, NAME);
+  enqueue({kind:"checkin", id:uid(), name:NAME, at:new Date().toISOString(), device:navigator.userAgent.slice(0,100)});
+  goHome();
+};
+$("bNotMe").onclick = () => { ls.del(K.name); NAME=""; $("fLast").value=""; $("fFirst").value=""; show("sName"); };
+
+/* ---------- 2. home ---------- */
+async function bankCached(e){ try{ return !!(await caches.match(e.bank, {ignoreSearch:true})); }catch(x){ return false; } }
+async function goHome(){
+  $("hiName").textContent = NAME;
+  const done = ls.get(K.done, {});
+  const box = $("examList"); box.innerHTML = "";
+  for(const e of EXAMS){
+    const d = done[nkey(e.id,NAME)], have = await bankCached(e);
+    const el = document.createElement("div"); el.className = "card exam";
+    const pill = d ? `<span class="pill ok">Submitted ✓</span>` : have ? `<span class="pill ok">Available offline ✓</span>` : `<span class="pill warn">Not downloaded</span>`;
+    el.innerHTML = `<div class="bar"><h2>${esc(e.title)}</h2>${pill}</div>
+      <p class="muted">${esc(e.topic)} · ${esc(e.info)}</p>
+      ${d ? `<p>Your score: <b>${d.score} / ${d.total}</b></p>` : `<div class="actions">
+        ${have ? "" : `<button class="btn2" data-dl>Download</button>`}
+        <button class="btn" data-go>Take exam</button></div>`}`;
+    const dl = el.querySelector("[data-dl]"), go = el.querySelector("[data-go]");
+    if(dl) dl.onclick = async () => { dl.disabled=true; dl.textContent="Downloading…"; const ok = await download(e); if(!ok){ dl.disabled=false; dl.textContent="Try again"; } else goHome(); };
+    if(go) go.onclick = () => openCode(e);
+    box.appendChild(el);
+  }
+  refreshStatus(); show("sHome");
+}
+async function download(e){
+  if(!navigator.onLine){ alertBox("No internet", "Connect to the internet first, then tap Download."); return false; }
+  try{
+    const c = await caches.open("pf-exams");
+    for(const f of [e.bank]){ const r = await fetch(f, {cache:"reload"}); if(!r.ok) throw 0; await c.put(f, r); }
+    if(navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(()=>{});
+    return true;
+  }catch(x){ alertBox("Download failed", "Check your internet and try again."); return false; }
+}
+function loadBank(e){
+  return new Promise((ok, no) => {
+    if(window.BANKS && BANKS[e.id]) return ok(BANKS[e.id]);
+    const s = document.createElement("script"); s.src = e.bank;
+    s.onload = () => (window.BANKS && BANKS[e.id]) ? ok(BANKS[e.id]) : no();
+    s.onerror = no; document.head.appendChild(s);
+  });
 }
 
-/* ===== points per item type ===== */
-const POINTS = {"Concept": 2, "Problem Solving": 5};
-
-/* ===== practice items (not graded) ===== */
-const TRIAL = { name:"Practice", items:[
-  {type:"Practice", q:"What is 2 + 3?", o:["4","5","6","7"], a:1},
-  {type:"Practice", q:"How many months are in one year?", o:["10","6","12","4"], a:2},
-  {type:"Practice", q:"Which is a color of this app?", o:["Pink","Blue","Green","Black"], a:0}
-]};
-
-/* ===== state ===== */
-let EXAMCODE = "", BANKDATA = null, student = null, exam = null, mode = "real", cur = 0, coachStep = -1;
-
-/* ===== start screen ===== */
-$("bStart").onclick = async () => {
-  const L=titleCase(cleanName($("fLast").value)), F=titleCase(cleanName($("fFirst").value)), C=$("fCode").value.trim();
-  $("startErr").textContent = "";
-  if(L.length<2 || F.length<2){ $("startErr").textContent = "Please type your Last Name and First Name."; return; }
-  const SID = `${L}, ${F}`;
-  if(!C){ $("startErr").textContent = "Please type the Exam Code."; return; }
-  $("bStart").disabled = true; $("bStart").textContent = "Checking code…";
-  try{ BANKDATA = await unlock(C); }
-  catch(e){ $("startErr").textContent = "Wrong Exam Code. Ask your teacher."; $("bStart").disabled=false; $("bStart").textContent="Continue"; return; }
-  $("bStart").disabled=false; $("bStart").textContent="Continue";
-  EXAMCODE = C; student = {name:SID};
-  // resume an unfinished exam on this device for the same student
-  const act = ls.get(LS_ACTIVE, null);
-  if(act && act.student.name && act.student.name.toLowerCase()===SID.toLowerCase()){
-    exam = act; mode = "real"; openExam(); return;
+/* ---------- 3. code ---------- */
+function openCode(e){ EXAM = e; $("codeTitle").textContent = e.title; $("codeTopic").textContent = e.topic; $("fCode").value=""; $("codeErr").textContent=""; show("sCode"); }
+$("bCodeBack").onclick = goHome;
+async function unwrap(bank, code){
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(code), "PBKDF2", false, ["deriveKey"]);
+  const wk = await crypto.subtle.deriveKey({name:"PBKDF2", salt:b64(bank.salt), iterations:bank.iter, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["decrypt"]);
+  for(const w of bank.wraps){
+    try{
+      const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64(w.iv)}, wk, b64(w.ct));
+      const {label, k} = JSON.parse(new TextDecoder().decode(pt));
+      const kk = await crypto.subtle.importKey("raw", b64(k), "AES-GCM", false, ["decrypt"]);
+      const data = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64(bank.iv)}, kk, b64(bank.ct));
+      return {label, data: JSON.parse(new TextDecoder().decode(data))};
+    }catch(x){}
   }
-  $("hiName").textContent = F;
-  show("sTrialIntro");
+  return null;
+}
+async function serverCheck(code){
+  if(!navigator.onLine || !API_URL.startsWith("https://")) return null;
+  try{
+    const ctl = new AbortController(); setTimeout(() => ctl.abort(), 8000);
+    const u = `${API_URL}?action=code&exam=${encodeURIComponent(EXAM.id)}&code=${encodeURIComponent(code)}&name=${encodeURIComponent(NAME)}`;
+    return await (await fetch(u, {signal:ctl.signal})).json();
+  }catch(x){ return null; }
+}
+$("bCode").onclick = async () => {
+  const code = $("fCode").value.trim().toUpperCase().replace(/\s+/g,""), err = $("codeErr"), b = $("bCode");
+  err.textContent = ""; if(!code){ err.textContent = "Please type the exam code."; return; }
+  b.disabled = true; b.textContent = "Checking…";
+  const fail = m => { err.textContent = m; b.disabled = false; b.textContent = "Start"; };
+  let bank; try{ bank = await loadBank(EXAM); }catch(x){ return fail("This exam is not downloaded. Go back and tap Download (needs internet)."); }
+  const u = await unwrap(bank, code);
+  if(!u) return fail("Wrong exam code. Ask your teacher.");
+  const master = u.label === "Master";
+  const done = ls.get(K.done, {});
+  if(done[nkey(EXAM.id,NAME)] && !master) return fail("You already took this exam.");
+
+  // resume an unfinished attempt (same exam + name)
+  const act = ls.get(K.active, null);
+  if(act && act.exam===EXAM.id && act.name===NAME){ BANKDATA = u.data; att = act; b.disabled=false; b.textContent="Start"; return toReady(); }
+
+  // code time window: server first (online), else this device
+  const codes = ls.get(K.codes, {}), ck = EXAM.id+"|"+u.label;
+  let expires = null, online = false;
+  if(!master){
+    const s = await serverCheck(code);
+    if(s && s.ok===false){
+      return fail(s.reason==="taken" ? "You already took this exam." : s.reason==="expired" ? "This code has expired. Ask your teacher." : "Code not accepted. Ask your teacher.");
+    }
+    if(s && s.ok){ online = true; expires = s.expiresAt; codes[ck] = Math.min(codes[ck] || Infinity, expires); }
+    else { if(!codes[ck]) codes[ck] = Date.now() + CODE_MINUTES*60000; expires = codes[ck]; }
+    ls.set(K.codes, codes);
+    if(Date.now() >= expires) return fail("This code has expired. Ask your teacher.");
+  } else { const s = await serverCheck(code); online = !!(s && s.ok); }
+
+  BANKDATA = u.data;
+  const si = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 2**32 * BANKDATA.sets.length);
+  att = { id:uid(), exam:EXAM.id, examTitle:EXAM.title, name:NAME, code:u.label, online, expires,
+          setIndex:si, setName:BANKDATA.sets[si].name, answers:Array(BANKDATA.sets[si].items.length).fill(null),
+          started:Date.now(), flags:[] };
+  ls.set(K.active, att);
+  enqueue(record("In progress"));
+  b.disabled=false; b.textContent="Start";
+  toReady();
 };
 
-/* ===== exam engine ===== */
-function newRealExam(){
-  const si = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 2**32 * BANKDATA.sets.length);
-  return { id: uid(), student, setIndex: si, setName: BANKDATA.sets[si].name, answers: Array(BANKDATA.sets[si].items.length).fill(null), started: Date.now(), flags: [] };
+/* ---------- 4. ready ---------- */
+function toReady(){
+  const it = BANKDATA.sets[att.setIndex].items, P = EXAM.points;
+  const total = it.reduce((s,x)=>s+(P[x.type]||1),0);
+  $("readyTitle").textContent = EXAM.title;
+  $("readyItems").textContent = `${it.length} items · ${total} points`;
+  $("readyTime").textContent = att.expires ? `${fmtLeft(att.expires-Date.now())} (until ${fmtTime(new Date(att.expires))})` : "No limit";
+  show("sReady");
 }
-function items(){ return mode==="trial" ? TRIAL.items : BANKDATA.sets[exam.setIndex].items; }
+$("bPractice").onclick = startPractice; $("bPracticeAgain").onclick = startPractice;
+$("bStartReal").onclick = startReal; $("bStartReal2").onclick = startReal;
+
+/* ---------- 5. exam engine ---------- */
+const PRACTICE = [
+  {type:"Practice", q:"What is 2 + 3?", o:["4","5","6","7"]},
+  {type:"Practice", q:"How many months are in one year?", o:["10","6","12","4"]},
+  {type:"Practice", q:"Which is a color of this app?", o:["Pink","Blue","Green","Black"]}
+];
+let practice = null;
+function items(){ return mode==="practice" ? PRACTICE : BANKDATA.sets[att.setIndex].items; }
+function answers(){ return mode==="practice" ? practice : att.answers; }
+function startPractice(){ mode="practice"; practice = Array(3).fill(null); openExam(); startCoach(); }
+function startReal(){ endCoach(); mode="real"; openExam(); }
 function openExam(){
   cur = 0;
-  $("exTitle").textContent = mode==="trial" ? "PRACTICE (not graded)" : exam.setName;
-  $("exWho").textContent = exam.student.name;
-  $("exStart").textContent = fmtTime(new Date(exam.started));
-  show("sExam"); render();
+  $("exTitle").textContent = mode==="practice" ? "PRACTICE" : `${att.examTitle} · ${att.setName}`;
+  $("exWho").textContent = NAME;
+  show("sExam"); render(); tick(); clearInterval(timerId); timerId = setInterval(tick, 1000);
+}
+function tick(){
+  if(!att.expires){ $("exTimer").textContent = ""; return; }
+  const left = att.expires - Date.now();
+  $("exTimer").textContent = "⏱ " + fmtLeft(left);
+  $("exTimer").classList.toggle("low", left < 5*60000);
+  if(left <= 0 && mode==="real" && !$("sExam").classList.contains("hidden")){ clearInterval(timerId); finish(true); }
 }
 function render(){
-  const it = items(), q = it[cur], n = it.length;
+  const it = items(), A = answers(), q = it[cur], n = it.length;
   $("qNum").textContent = `Question ${cur+1} of ${n}`;
-  $("qType").textContent = q.type;
+  $("qType").textContent = mode==="practice" ? "practice" : `${q.type} · ${EXAM.points[q.type]||1} pt${(EXAM.points[q.type]||1)>1?"s":""}`;
   $("qText").textContent = q.q;
-  $("choices").innerHTML = q.o.map((o,i)=>`<button class="choice${exam.answers[cur]===i?" sel":""}" data-i="${i}"><span class="ltr">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`).join("");
-  $("choices").querySelectorAll(".choice").forEach(b => b.onclick = () => pick(+b.dataset.i));
+  $("choices").innerHTML = q.o.map((o,i)=>`<button class="choice${A[cur]===i?" sel":""}" data-i="${i}"><span class="ltr">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`).join("");
+  $("choices").querySelectorAll(".choice").forEach(b => b.onclick = () => { A[cur] = +b.dataset.i; if(mode==="real") ls.set(K.active, att); render(); coachEvent("pick"); });
   $("bPrev").disabled = cur===0;
-  $("bNext").textContent = cur===n-1 ? "Review ▶" : "Next ▶";
-  $("grid").innerHTML = it.map((_,i)=>`<button class="${exam.answers[i]!==null?"ans":""}${i===cur?" cur":""}" data-i="${i}" aria-label="Question ${i+1}">${i+1}</button>`).join("");
+  $("bNext").textContent = cur===n-1 ? "Done ▶" : "Next ▶";
+  $("grid").innerHTML = it.map((_,i)=>`<button class="${A[i]!==null?"ans":""}${i===cur?" cur":""}" data-i="${i}">${i+1}</button>`).join("");
   $("grid").querySelectorAll("button").forEach(b => b.onclick = () => { cur=+b.dataset.i; render(); coachEvent("jump"); });
-  $("exProg").textContent = `Answered ${exam.answers.filter(a=>a!==null).length} of ${n}`;
+  $("exProg").textContent = `Answered ${A.filter(a=>a!==null).length} of ${n}`;
 }
-function pick(i){
-  exam.answers[cur] = i;
-  if(mode==="real") ls.set(LS_ACTIVE, exam);
-  render(); coachEvent("pick");
-}
-$("bPrev").onclick = () => { if(cur>0){ cur--; render(); coachEvent("prev"); } };
-$("bNext").onclick = () => {
-  if(cur < items().length-1){ cur++; render(); coachEvent("next"); }
-  else { document.getElementById("gridCard").scrollIntoView({behavior:"smooth"}); coachEvent("next"); }
-};
+$("bPrev").onclick = () => { if(cur>0){ cur--; render(); } };
+$("bNext").onclick = () => { if(cur<items().length-1){ cur++; render(); coachEvent("next"); } else { $("bSubmit").scrollIntoView({behavior:"smooth"}); coachEvent("next"); } };
 $("bSubmit").onclick = () => {
-  const miss = exam.answers.map((a,i)=>a===null?i+1:null).filter(Boolean);
-  $("mTitle").textContent = "Submit your exam?";
+  const miss = answers().map((a,i)=>a===null?i+1:null).filter(Boolean);
+  $("mTitle").textContent = "Submit now?";
   $("mBody").innerHTML = miss.length
-    ? `<p>You still have <b style="color:var(--bad)">${miss.length} unanswered</b> question${miss.length>1?"s":""}: <b>${miss.join(", ")}</b></p><p>Unanswered questions get 0 points.</p>`
-    : `<p>All questions are answered. ✅</p><p>After you submit, you <b>cannot change</b> your answers.</p>`;
-  $("modal").classList.remove("hidden");
-  coachEvent("submit");
+    ? `<p>You have <b style="color:var(--bad)">${miss.length} unanswered</b>: <b>${miss.join(", ")}</b>. These get 0 points.</p>`
+    : `<p>All questions are answered. ✅ You cannot change answers after this.</p>`;
+  $("mYes").classList.remove("hidden"); $("mNo").textContent = "Go back";
+  $("modal").classList.remove("hidden"); coachEvent("submit");
 };
 $("mNo").onclick = () => { $("modal").classList.add("hidden"); coachEvent("cancel"); };
-$("mYes").onclick = async () => {
-  $("modal").classList.add("hidden");
-  if(mode==="trial"){ endCoach(); show("sTrialDone"); return; }
-  await finishReal();
-};
+$("mYes").onclick = () => { $("modal").classList.add("hidden"); if(mode==="practice"){ endCoach(); show("sPracticeDone"); } else finish(false); };
+function alertBox(t, msg){ $("mTitle").textContent=t; $("mBody").innerHTML=`<p>${esc(msg)}</p>`; $("mYes").classList.add("hidden"); $("mNo").textContent="OK"; $("modal").classList.remove("hidden"); }
 
-/* ===== trial flow ===== */
-$("bTrial").onclick = startTrial;
-$("bTrialAgain").onclick = startTrial;
-$("bSkipTrial").onclick = startReal;
-$("bReal").onclick = startReal;
-function startTrial(){
-  mode = "trial";
-  exam = { student, setName:"Practice", answers:Array(TRIAL.items.length).fill(null), started:Date.now() };
-  openExam(); startCoach();
-}
-function startReal(){
-  endCoach(); mode = "real";
-  exam = newRealExam(); ls.set(LS_ACTIVE, exam); openExam();
-}
-
-/* ===== coach marks (tutorial) ===== */
-const COACH = [
-  {el:"exTitle", say:`This shows which test you are taking. Right now it says <span class="hl">PRACTICE</span>. In the real exam it shows your <b>Set</b> (A, B, C, D, or E).`, btn:"Next"},
-  {el:"qNum", say:`This tells you the <span class="hl">question number</span> and how many questions there are.`, btn:"Next"},
-  {el:"qText", say:`<span class="hl">Read</span> the question carefully. Take your time!`, btn:"Next"},
-  {el:"choices", say:`Here are the <b>4 choices</b>. 2 + 3 = 5, so <span class="hl">tap the answer "5"</span> now.`, wait:"pick"},
-  {el:"choices", say:`See? Your answer turned <b style="color:var(--pink)">pink</b>. That means it is selected. ✅<br>Changed your mind? Just tap another choice.`, btn:"Next"},
-  {el:"bNext", say:`Now <span class="hl">tap Next ▶</span> to go to the next question.`, wait:"next"},
-  {el:"choices", say:`Question 2! How many months are in one year? <span class="hl">Tap your answer.</span>`, wait:"pick"},
-  {el:"gridCard", say:`These boxes are all the questions.<br><b style="color:var(--pink)">Pink box</b> = answered.<br><b>White box</b> = not answered yet.<br><span class="hl">Tap box 3</span> to jump to question 3.`, wait:"jump"},
-  {el:"exProg", say:`This counts how many you have <span class="hl">answered</span>. Let's leave question 3 empty to see what happens.`, btn:"Next"},
-  {el:"bSubmit", say:`When you are done, <span class="hl">tap Submit Exam</span>.`, wait:"submit"},
-  {el:"mNo", say:`The app <b>warns you</b> if you missed a question. 👀<br><span class="hl">Tap "Go back"</span> so you can answer it.`, wait:"cancel", inner:true},
-  {el:"gridCard", say:`<span class="hl">Tap box 3</span>, the white one.`, wait:"jump"},
-  {el:"choices", say:`<span class="hl">Tap an answer</span> for question 3.`, wait:"pick"},
-  {el:"bSubmit", say:`All boxes are pink now! <span class="hl">Tap Submit Exam</span>.`, wait:"submit"},
-  {el:"mYes", say:`Everything is answered. <span class="hl">Tap "Yes, submit"</span> to finish the practice.`, wait:"none", inner:true}
-];
-function startCoach(){ coachStep = 0; $("coach").classList.remove("hidden"); drawCoach(); }
-function endCoach(){ coachStep = -1; $("coach").classList.add("hidden"); document.querySelectorAll(".coach-lift").forEach(x=>x.classList.remove("coach-lift")); }
-function coachEvent(ev){
-  if(coachStep<0 || mode!=="trial") return;
-  const st = COACH[coachStep];
-  if(st.wait === ev){ coachStep++; setTimeout(drawCoach, 120); }
-  else if(coachStep>=0) setTimeout(drawCoach, 60);
-}
-function drawCoach(){
-  if(coachStep<0 || coachStep>=COACH.length) return;
-  const st = COACH[coachStep];
-  const el = $(st.el);
-  if(!st.inner) el.scrollIntoView({block:"center", behavior:"instant"});
-  requestAnimationFrame(() => {
-    const r = el.getBoundingClientRect(), ring = $("coach").querySelector(".ring"), tip = $("coach").querySelector(".tip");
-    const p = 6;
-    Object.assign(ring.style, {left:(r.left-p)+"px", top:(r.top-p)+"px", width:(r.width+2*p)+"px", height:(r.height+2*p)+"px"});
-    tip.querySelector(".step").textContent = `Practice guide · Step ${coachStep+1} of ${COACH.length}`;
-    tip.querySelector(".say").innerHTML = st.say;
-    const act = tip.querySelector(".act");
-    act.innerHTML = (st.btn ? `<button class="btn" id="cNext">${st.btn} ▶</button>` : `<span class="muted">👆 Do it on the highlighted part.</span>`) + `<button class="btn2" id="cSkip" style="flex:0 0 auto">Skip guide</button>`;
-    if(st.btn) $("cNext").onclick = () => { coachStep++; drawCoach(); };
-    $("cSkip").onclick = endCoach;
-    // place tip above or below the highlighted area
-    const vh = innerHeight, th = tip.offsetHeight;
-    tip.style.top = (r.bottom + 16 + th < vh) ? (r.bottom + 16)+"px" : Math.max(8, r.top - th - 16)+"px";
-  });
-  // lift highlighted element above overlay so it is tappable
-  document.querySelectorAll(".coach-lift").forEach(x=>x.classList.remove("coach-lift"));
-  // only the highlighted part can be tapped
-  $("coach").style.zIndex = st.inner ? 60 : 40;
-  $("coach").querySelector(".block").style.display = st.inner ? "none" : "";
-  if(!st.inner) el.classList.add("coach-lift");
-}
-addEventListener("resize", () => drawCoach());
-addEventListener("scroll", () => { if(coachStep>=0) drawCoach(); }, {passive:true});
-
-/* ===== cheating flags (logged only, real exam only) ===== */
-let lastFlag = {k:"", at:0};
+/* ---------- flags (logged only) ---------- */
+let lastFlag = {k:"",at:0};
 function flag(kind){
-  if(mode!=="real" || !exam || !exam.flags || $("sExam").classList.contains("hidden")) return;
-  const now = Date.now();
-  if(lastFlag.k===kind && now-lastFlag.at < 1500) return;   // ignore duplicate bursts
-  lastFlag = {k:kind, at:now};
-  exam.flags.push({t: fmtTime(new Date(now)), k: kind});
-  ls.set(LS_ACTIVE, exam);
+  if(mode!=="real" || !att || $("sExam").classList.contains("hidden")) return;
+  const now = Date.now(); if(lastFlag.k===kind && now-lastFlag.at<1500) return;
+  lastFlag = {k:kind, at:now}; att.flags.push(`${fmtTime(new Date(now))} ${kind}`); ls.set(K.active, att);
 }
-document.addEventListener("visibilitychange", () => { if(document.hidden) flag("left app/tab"); });
-addEventListener("blur", () => { setTimeout(() => { if(!document.hidden) flag("lost focus"); }, 300); });
+document.addEventListener("visibilitychange", () => { if(document.hidden) flag("left app"); else syncNow(); });
+addEventListener("blur", () => setTimeout(() => { if(!document.hidden) flag("lost focus"); }, 300));
 ["copy","cut","paste"].forEach(ev => document.addEventListener(ev, () => flag(ev)));
-document.addEventListener("contextmenu", () => flag("right-click/long-press"));
-addEventListener("pagehide", () => flag("closed/reloaded app"));
+document.addEventListener("contextmenu", () => flag("long-press/right-click"));
+addEventListener("pagehide", () => flag("closed app"));
 
-/* ===== finish & save ===== */
-async function finishReal(){
-  const it = BANKDATA.sets[exam.setIndex].items, salt = BANKDATA.keySalt;
-  let score = 0, total = 0, nOk = 0; const marks = [];
+/* ---------- 6. finish ---------- */
+let scoreCache = null;
+function record(status){
+  const t1 = new Date(att.started), t2 = att.ended ? new Date(att.ended) : null, s = scoreCache || {};
+  return { kind:"result", id:att.id, status, exam:att.examTitle, name:att.name, set:att.setName, code:att.code,
+    online:att.online ? "Yes" : "No (offline)", date:fmtDate(t1), timeStarted:fmtTime(t1), timeEnded:t2?fmtTime(t2):"",
+    duration:t2?`${Math.floor((t2-t1)/60000)} min ${Math.round((t2-t1)/1000)%60} sec`:"",
+    score:s.score ?? "", total:s.total ?? "", percent:s.percent ?? "",
+    flags:att.flags.length, flagDetails:att.flags.join("; "),
+    answers:att.answers.map((a,i)=>`${i+1}:${a===null?"-":"ABCD"[a]}`).join(" "), marks:s.marks || "" };
+}
+async function finish(auto){
+  clearInterval(timerId); endCoach();
+  const it = BANKDATA.sets[att.setIndex].items, P = EXAM.points, salt = BANKDATA.keySalt;
+  let score=0, total=0; const marks=[];
   for(let i=0;i<it.length;i++){
-    const a = exam.answers[i], pts = POINTS[it[i].type] || 1;
-    const ok = a!==null && (await sha(`${salt}|${exam.setIndex}|${i}|${it[i].o[a]}`)) === it[i].k;
-    total += pts; if(ok){ score += pts; nOk++; } marks.push(ok ? "✓" : "✗");
+    const a = att.answers[i], pts = P[it[i].type]||1; total += pts;
+    const ok = a!==null && (await sha(`${salt}|${att.setIndex}|${i}|${it[i].o[a]}`)) === it[i].k;
+    if(ok) score += pts; marks.push(ok?"✓":"✗");
   }
-  const t1 = new Date(exam.started), t2 = new Date();
-  const s = exam.student;
-  const rec = {
-    id: exam.id, date: fmtDate(t1),
-    name: s.name,
-    flags: (exam.flags||[]).length,
-    flagDetails: (exam.flags||[]).map(f=>`${f.t} ${f.k}`).join("; "),
-    set: exam.setName, score, total, percent: Math.round(score/total*1000)/10, correct: `${nOk}/${it.length}`,
-    timeStarted: fmtTime(t1), timeEnded: fmtTime(t2), duration: fmtDur(t2-t1),
-    answers: exam.answers.map((a,i)=>`${i+1}:${a===null?"-":"ABCD"[a]}`).join(" "),
-    marks: marks.join(""),
-    device: navigator.userAgent.slice(0,120)
-  };
-  const q = ls.get(LS_QUEUE, []); q.push(rec); ls.set(LS_QUEUE, q);
-  const packed = await packRecord(rec);
-  const done = ls.get(LS_DONE, []); done.push(Object.assign({qr:packed}, rec)); ls.set(LS_DONE, done.slice(-200));
-  ls.del(LS_ACTIVE);
+  att.ended = Date.now();
+  scoreCache = {score, total, percent:Math.round(score/total*1000)/10, marks:marks.join("")};
+  const rec = record(auto ? "Submitted (time up)" : "Submitted");
+  enqueue(rec);
+  const done = ls.get(K.done, {}); done[nkey(att.exam,att.name)] = {score, total, at:att.ended}; ls.set(K.done, done);
+  ls.del(K.active);
   $("rScore").textContent = `${score} / ${total}`;
-  $("rName").textContent = s.name; $("rSet").textContent = exam.setName; $("rFlags").textContent = rec.flags;
-  drawResultQR(packed);
-  $("rDate").textContent = rec.date; $("rT1").textContent = rec.timeStarted; $("rT2").textContent = rec.timeEnded; $("rDur").textContent = rec.duration;
-  setUpPill("warn","Saved on device · uploading…");
-  show("sResult");
-  await syncNow();
-  const still = ls.get(LS_QUEUE, []).some(r => r.id===rec.id);
-  setUpPill(still?"warn":"ok", still ? "Saved on device · will upload when online" : "Uploaded ✓");
+  $("rName").textContent = att.name; $("rExam").textContent = att.examTitle; $("rSet").textContent = att.setName;
+  $("rDate").textContent = rec.date; $("rT1").textContent = rec.timeStarted; $("rT2").textContent = rec.timeEnded + (auto ? " (time up)" : "");
+  setUp(); show("sResult");
+  await syncNow(); setUp();
+  scoreCache = null;
 }
-function setUpPill(cls, txt){ const p=$("rUp"); p.className="pill "+cls; p.textContent=txt; }
-$("bDone").onclick = () => { ["fLast","fFirst","fCode"].forEach(i=>$(i).value=""); BANKDATA=null; exam=null; refreshStatus(); show("sStart"); };
+function setUp(){
+  const pending = ls.get(K.queue,[]).some(r => r.id===att.id && r.status && r.status.startsWith("Submitted"));
+  const p = $("rUp"); p.className = "pill " + (pending?"warn":"ok"); p.textContent = pending ? "Saved · will upload when online" : "Uploaded ✓";
+}
+$("bDone").onclick = goHome;
 
-/* ===== result QR (AES-GCM, key from exam code) ===== */
-async function qrKey(code, salt){
-  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode("RQR|"+code), "PBKDF2", false, ["deriveKey"]);
-  return crypto.subtle.deriveKey({name:"PBKDF2", salt, iterations:100000, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["encrypt","decrypt"]);
+/* ---------- upload queue ---------- */
+function enqueue(r){
+  const q = ls.get(K.queue, []);
+  const i = q.findIndex(x => x.kind===r.kind && x.id===r.id);
+  if(i>=0) q[i] = r; else q.push(r);
+  ls.set(K.queue, q); syncNow();
 }
-const toB64 = u8 => btoa(String.fromCharCode(...u8));
-async function packRecord(rec){
-  const compact = [rec.id, rec.name, rec.date, rec.set, rec.score, rec.total, rec.timeStarted, rec.timeEnded, rec.duration, rec.answers, rec.marks, rec.flags, rec.flagDetails];
-  const salt = crypto.getRandomValues(new Uint8Array(8)), iv = crypto.getRandomValues(new Uint8Array(12));
-  const ct = new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM", iv}, await qrKey(EXAMCODE, salt), new TextEncoder().encode(JSON.stringify(compact))));
-  return "MEPF2." + toB64(salt) + "." + toB64(iv) + "." + toB64(ct);
-}
-async function unpackRecord(txt, code){
-  const p = txt.trim().split(".");
-  if(p.length!==4 || p[0]!=="MEPF2") throw new Error("Not a Math Enhancement result QR.");
-  const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64(p[2])}, await qrKey(code, b64(p[1])), b64(p[3]));
-  const a = JSON.parse(new TextDecoder().decode(pt));
-  return {id:a[0], name:a[1], date:a[2], set:a[3], score:a[4], total:a[5], percent:Math.round(a[4]/a[5]*1000)/10,
-          timeStarted:a[6], timeEnded:a[7], duration:a[8], answers:a[9], marks:a[10], flags:a[11], flagDetails:a[12], device:"QR scan"};
-}
-function drawResultQR(packed){
-  const qr = qrcode(0, "L"); qr.addData(packed); qr.make();
-  $("rQR").innerHTML = qr.createSvgTag({cellSize:5, margin:2, scalable:true});
-  const svg = $("rQR").querySelector("svg"); svg.style.width = "min(72vw, 300px)"; svg.style.height = "auto"; svg.style.display = "block";
-}
-
-/* ===== teacher scanner ===== */
-let scanStream = null, scanCode = "";
-$("bTeacher").onclick = () => { $("tErr").textContent=""; $("tLog").innerHTML=""; show("sTeacher"); };
-$("tBack").onclick = () => { stopScan(); refreshStatus(); show("sStart"); };
-$("tStart").onclick = async () => {
-  const c = $("tCode").value.trim(); $("tErr").textContent = "";
-  try{ await unlock(c); }catch(e){ $("tErr").textContent = "Wrong Exam Code."; return; }
-  scanCode = c;
-  try{
-    scanStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}, audio:false});
-  }catch(e){ $("tErr").textContent = "Camera not available. Allow camera access and try again."; return; }
-  const v = $("tVideo"); v.srcObject = scanStream; v.setAttribute("playsinline",""); await v.play();
-  $("tCam").classList.remove("hidden"); $("tStart").classList.add("hidden");
-  requestAnimationFrame(scanTick);
-};
-function stopScan(){ if(scanStream){ scanStream.getTracks().forEach(t=>t.stop()); scanStream=null; } $("tCam").classList.add("hidden"); $("tStart").classList.remove("hidden"); }
-let lastScan = "", busy = false;
-async function scanTick(){
-  if(!scanStream) return;
-  const v = $("tVideo"), cv = $("tCanvas");
-  if(v.readyState === v.HAVE_ENOUGH_DATA && !busy){
-    cv.width = v.videoWidth; cv.height = v.videoHeight;
-    const ctx = cv.getContext("2d", {willReadFrequently:true}); ctx.drawImage(v, 0, 0);
-    const img = ctx.getImageData(0, 0, cv.width, cv.height);
-    const hit = jsQR(img.data, img.width, img.height, {inversionAttempts:"dontInvert"});
-    if(hit && hit.data && hit.data !== lastScan){ lastScan = hit.data; busy = true; await handleScan(hit.data); busy = false; }
-  }
-  requestAnimationFrame(scanTick);
-}
-async function handleScan(txt){
-  let rec;
-  try{ rec = await unpackRecord(txt, scanCode); }
-  catch(e){ logScan(`<span style="color:var(--bad)">✗ Not a valid result QR</span>`); return; }
-  const q = ls.get(LS_QUEUE, []), seen = ls.get(LS_DONE, []);
-  if(q.some(r=>r.id===rec.id) || seen.some(r=>r.id===rec.id)){ logScan(`↺ <b>${esc(rec.name)}</b> already scanned`); return; }
-  q.push(rec); ls.set(LS_QUEUE, q); seen.push(rec); ls.set(LS_DONE, seen.slice(-500));
-  if(navigator.vibrate) navigator.vibrate(80);
-  logScan(`✓ <b>${esc(rec.name)}</b> · ${esc(rec.set)} · <b>${rec.score}/${rec.total}</b>`);
-  syncNow();
-}
-function logScan(h){ const d=document.createElement("div"); d.style.padding="6px 0"; d.style.borderBottom="1px solid var(--pink-soft)"; d.innerHTML=h; $("tLog").prepend(d); $("tCount").textContent = ls.get(LS_QUEUE,[]).length; }
-
-/* ===== sync ===== */
 let syncing = false;
 async function syncNow(){
-  const q = ls.get(LS_QUEUE, []);
-  if(syncing || !q.length) { refreshStatus(); return; }
-  if(!API_URL.startsWith("https://")){ $("syncMsg").textContent = "Upload link not set up yet."; refreshStatus(); return; }
-  if(!navigator.onLine){ refreshStatus(); return; }
-  syncing = true; $("syncMsg").textContent = "Uploading…";
+  const q = ls.get(K.queue, []);
+  if(syncing || !q.length || !navigator.onLine || !API_URL.startsWith("https://")){ refreshStatus(); return; }
+  syncing = true;
   try{
     const res = await fetch(API_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify({records:q})});
     const j = await res.json();
     if(j.ok){
-      const okIds = new Set(j.saved.concat(j.duplicates||[]));
-      ls.set(LS_QUEUE, ls.get(LS_QUEUE, []).filter(r => !okIds.has(r.id)));
-      $("syncMsg").textContent = `Uploaded ${j.saved.length} result(s).`;
-    } else $("syncMsg").textContent = "Upload failed: " + (j.error||"server error");
-  }catch(e){ $("syncMsg").textContent = "Could not reach server. Will try again."; }
+      const sent = new Set(q.map(r => r.kind+"|"+r.id+"|"+(r.status||"")));
+      ls.set(K.queue, ls.get(K.queue,[]).filter(r => !sent.has(r.kind+"|"+r.id+"|"+(r.status||""))));
+    }
+  }catch(x){}
   syncing = false; refreshStatus();
 }
 function refreshStatus(){
-  $("bLast").classList.toggle("hidden", !lastOwn());
-  $("pendN").textContent = ls.get(LS_QUEUE, []).length;
-  const on = navigator.onLine, p = $("netPill");
+  const n = ls.get(K.queue,[]).length, on = navigator.onLine, p = $("netPill");
   p.className = "pill " + (on?"ok":"warn"); p.textContent = on ? "Online" : "Offline";
+  $("queueMsg").textContent = n ? `${n} waiting to upload` : "All saved ✓";
+  $("bSync").classList.toggle("hidden", !n || !on);
 }
 $("bSync").onclick = syncNow;
-function lastOwn(){ return ls.get(LS_DONE, []).filter(r=>r.qr).pop(); }
-$("bLast").onclick = () => {
-  const r = lastOwn(); if(!r) return;
-  $("rScore").textContent = `${r.score} / ${r.total}`; $("rName").textContent = r.name; $("rSet").textContent = r.set; $("rFlags").textContent = r.flags;
-  $("rDate").textContent = r.date; $("rT1").textContent = r.timeStarted; $("rT2").textContent = r.timeEnded; $("rDur").textContent = r.duration;
-  const pending = ls.get(LS_QUEUE, []).some(x=>x.id===r.id);
-  setUpPill(pending?"warn":"ok", pending ? "Saved on device · will upload when online" : "Uploaded ✓");
-  drawResultQR(r.qr); show("sResult");
-};
-addEventListener("online", syncNow);
-addEventListener("offline", refreshStatus);
-document.addEventListener("visibilitychange", () => { if(!document.hidden) syncNow(); });
+addEventListener("online", syncNow); addEventListener("offline", refreshStatus);
 setInterval(syncNow, 60000);
 
-/* ===== download for offline + install ===== */
-const APP_FILES = ["./", "index.html", "config.js", "bank.enc.js", "manifest.json", "icon-180.png", "icon-192.png", "icon-512.png", "qrcode.js", "jsQR.js"];
-async function appCache(){ const ks = await caches.keys(); const k = ks.filter(x=>x.startsWith("me-prefinal-")).sort().pop(); return k ? caches.open(k) : null; }
-async function checkDownloaded(){
-  const pill = $("dlPill");
-  try{
-    const c = await appCache(); let have = 0;
-    if(c) for(const f of APP_FILES) if(await c.match(f, {ignoreSearch:true})) have++;
-    const ok = have === APP_FILES.length;
-    pill.className = "pill " + (ok ? "ok" : "warn"); pill.textContent = ok ? "Ready offline ✓" : "Not downloaded";
-    $("bDl").textContent = ok ? "Download again (update)" : "Download exam";
-    $("bDl").className = ok ? "btn2 full" : "btn full";
-    $("dlMsg").textContent = ok ? "The exam is saved on this device. You can take it with no internet." : "Download while you have internet. After that the exam works with no internet.";
-    return ok;
-  }catch(e){ pill.className="pill warn"; pill.textContent="Not supported"; $("dlMsg").textContent="This browser cannot save the exam. Use Safari (iPhone) or Chrome."; return false; }
+/* ---------- practice guide ---------- */
+const COACH = [
+  {el:"qText", say:`<span class="hl">Read</span> the question.`, btn:true},
+  {el:"choices", say:`2 + 3 = 5. <span class="hl">Tap "5"</span>.`, wait:"pick"},
+  {el:"choices", say:`It turned <b style="color:var(--pink)">pink</b> = selected. Tap another to change.`, btn:true},
+  {el:"bNext", say:`<span class="hl">Tap Next ▶</span>.`, wait:"next"},
+  {el:"choices", say:`<span class="hl">Tap your answer.</span>`, wait:"pick"},
+  {el:"gridCard", say:`These boxes are the questions. Pink = answered. <span class="hl">Tap box 3</span>.`, wait:"jump"},
+  {el:"choices", say:`<span class="hl">Tap your answer.</span>`, wait:"pick"},
+  {el:"exTimer", say:`This is the <span class="hl">time left</span>. When it reaches 0:00, the exam submits by itself.`, btn:true},
+  {el:"bSubmit", say:`All done? <span class="hl">Tap Submit</span>.`, wait:"submit"},
+  {el:"mYes", say:`<span class="hl">Tap "Yes, submit"</span>.`, wait:"none", inner:true}
+];
+let cs = -1;
+function startCoach(){ cs = 0; $("coach").classList.remove("hidden"); drawCoach(); }
+function endCoach(){ cs = -1; $("coach").classList.add("hidden"); document.querySelectorAll(".coach-lift").forEach(x=>x.classList.remove("coach-lift")); }
+function coachEvent(ev){ if(cs<0 || mode!=="practice") return; if(COACH[cs].wait===ev) cs++; setTimeout(drawCoach, 80); }
+function drawCoach(){
+  if(cs<0 || cs>=COACH.length) return;
+  if(COACH[cs].el==="exTimer" && !att.expires){ cs++; return drawCoach(); }
+  const st = COACH[cs], el = $(st.el);
+  if(!st.inner) el.scrollIntoView({block:"center", behavior:"instant"});
+  document.querySelectorAll(".coach-lift").forEach(x=>x.classList.remove("coach-lift"));
+  $("coach").style.zIndex = st.inner ? 60 : 40;
+  $("coach").querySelector(".block").style.display = st.inner ? "none" : "";
+  if(!st.inner) el.classList.add("coach-lift");
+  requestAnimationFrame(() => {
+    const r = el.getBoundingClientRect(), ring = $("coach").querySelector(".ring"), tip = $("coach").querySelector(".tip");
+    Object.assign(ring.style, {left:(r.left-6)+"px", top:(r.top-6)+"px", width:(r.width+12)+"px", height:(r.height+12)+"px"});
+    tip.querySelector(".step").textContent = `Practice guide · ${cs+1} of ${COACH.length}`;
+    tip.querySelector(".say").innerHTML = st.say;
+    tip.querySelector(".act").innerHTML = (st.btn ? `<button class="btn" id="cNext">Next ▶</button>` : `<span class="muted" style="flex:1">👆 Tap the highlighted part.</span>`) + `<button class="btn2" id="cSkip">Skip</button>`;
+    if(st.btn) $("cNext").onclick = () => { cs++; drawCoach(); };
+    $("cSkip").onclick = endCoach;
+    const th = tip.offsetHeight;
+    tip.style.top = (r.bottom+16+th < innerHeight) ? (r.bottom+16)+"px" : Math.max(8, r.top-th-16)+"px";
+  });
 }
-$("bDl").onclick = async () => {
-  if(!navigator.onLine){ $("dlMsg").textContent = "No internet. Connect first, then tap Download."; return; }
-  const b = $("bDl"); b.disabled = true; b.textContent = "Downloading…";
-  try{
-    const reg = await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready;
-    try{ await reg.update(); }catch(e){}
-    const ks = await caches.keys(); const name = ks.filter(x=>x.startsWith("me-prefinal-")).sort().pop() || "me-prefinal-manual";
-    const c = await caches.open(name);
-    for(const f of APP_FILES){ const r = await fetch(f, {cache:"reload"}); if(!r.ok) throw new Error(f); await c.put(f, r); }
-    if(navigator.storage && navigator.storage.persist) try{ await navigator.storage.persist(); }catch(e){}
-  }catch(e){ $("dlMsg").textContent = "Download failed. Check the internet and try again."; }
-  b.disabled = false; await checkDownloaded();
-};
+addEventListener("resize", drawCoach);
+
+/* ---------- install / offline shell ---------- */
 let installEvt = null;
 addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; $("bInstall").classList.remove("hidden"); });
-$("bInstall").onclick = async () => { if(!installEvt) return; installEvt.prompt(); await installEvt.userChoice; installEvt = null; $("bInstall").classList.add("hidden"); };
+$("bInstall").onclick = async () => { if(!installEvt) return; installEvt.prompt(); await installEvt.userChoice; installEvt=null; $("bInstall").classList.add("hidden"); };
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
-const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
-if(isIOS && !standalone) $("iosTip").classList.remove("hidden");
-addEventListener("appinstalled", () => $("bInstall").classList.add("hidden"));
+if(isIOS && !(navigator.standalone || matchMedia("(display-mode: standalone)").matches)) $("iosTip").classList.remove("hidden");
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
 
-/* ===== boot ===== */
-refreshStatus(); syncNow();
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("sw.js").then(() => navigator.serviceWorker.ready).then(checkDownloaded).catch(checkDownloaded);
-  // new version installed: refresh only while on the start screen
-  navigator.serviceWorker.addEventListener("controllerchange", () => { if(!$("sStart").classList.contains("hidden") && !$("fLast").value) location.reload(); else checkDownloaded(); });
-} else checkDownloaded();
+/* ---------- boot ---------- */
+(function boot(){
+  const act = ls.get(K.active, null);
+  if(NAME){ goHome().then(() => { if(act && act.name===NAME){ const e = examById(act.exam); if(e){ openCode(e); $("codeErr").textContent = "You have an unfinished exam. Type your code to continue."; } } }); }
+  else show("sName");
+  syncNow();
+})();
 </script>
 </body>
 </html>
