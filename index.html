@@ -93,9 +93,10 @@ table.info td:first-child{color:var(--muted);width:42%}
   <p><b>Prefinal Examination</b> · Simple and Compound Interest</p>
   <div class="card">
     <h2>Enter your details</h2>
-    <label for="fSid">Student Code</label>
-    <input id="fSid" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. JDC101226" style="text-transform:uppercase;font-size:1.2rem;letter-spacing:.06em">
-    <p class="muted">Your initials + today's date (MMDDYY). Example: <b>J</b>uan <b>D</b>ela <b>C</b>ruz on Oct 12, 2026 → <span class="hl">JDC101226</span>. Add <b>01</b>, <b>02</b>… only if your teacher tells you.</p>
+    <div class="row">
+      <div><label for="fLast">Last Name</label><input id="fLast" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="e.g. Dela Cruz"></div>
+      <div><label for="fFirst">First Name</label><input id="fFirst" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="e.g. Juan"></div>
+    </div>
     <label for="fCode">Exam Code <span class="muted">(given by your teacher)</span></label>
     <input id="fCode" type="password" placeholder="Exam code" autocomplete="off" autocapitalize="off" spellcheck="false">
     <div id="startErr" class="err"></div>
@@ -188,7 +189,8 @@ table.info td:first-child{color:var(--muted);width:42%}
   </div>
   <div class="card">
     <table class="info">
-      <tr><td>Student Code</td><td id="rName"></td></tr>
+      <tr><td>Name</td><td id="rName"></td></tr>
+      <tr><td>Flags</td><td id="rFlags"></td></tr>
       <tr><td>Set</td><td id="rSet"></td></tr>
       <tr><td>Date</td><td id="rDate"></td></tr>
       <tr><td>Time started</td><td id="rT1"></td></tr>
@@ -254,16 +256,9 @@ const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 async function sha(t){ const h = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)); return btoa(String.fromCharCode(...new Uint8Array(h))); }
 
-/* ===== student code: INITIALS + MMDDYY + optional 2-digit suffix ===== */
-function todayCode(){ const d=new Date(); return pad(d.getMonth()+1)+pad(d.getDate())+String(d.getFullYear()).slice(-2); }
-function checkSid(c){
-  if(!c) return "Please type your Student Code.";
-  const m = c.match(/^([A-Z]{2,5})(\d{2})(\d{2})(\d{2})(\d{2})?$/);
-  if(!m) return "Student Code looks wrong. Example: JDC101226 (initials + MMDDYY).";
-  const mm=+m[2], dd=+m[3];
-  if(mm<1||mm>12||dd<1||dd>31) return "The date part of your code is not a real date. Use MMDDYY, e.g. 101226.";
-  return "";
-}
+/* ===== names ===== */
+const cleanName = v => v.trim().replace(/\s+/g," ").replace(/[^\p{L}\p{M} .'\-ñÑ]/gu,"");
+const titleCase = v => v.toLowerCase().replace(/(^|[\s\-'])(\p{L})/gu, (m,a,b)=>a+b.toUpperCase());
 
 /* ===== decrypt bank ===== */
 async function unlock(code){
@@ -285,34 +280,35 @@ let EXAMCODE = "", BANKDATA = null, student = null, exam = null, mode = "real", 
 
 /* ===== start screen ===== */
 $("bStart").onclick = async () => {
-  const SID=$("fSid").value.trim().toUpperCase().replace(/\s+/g,""), C=$("fCode").value.trim();
+  const L=titleCase(cleanName($("fLast").value)), F=titleCase(cleanName($("fFirst").value)), C=$("fCode").value.trim();
   $("startErr").textContent = "";
-  const chk = checkSid(SID); if(chk){ $("startErr").textContent = chk; return; }
+  if(L.length<2 || F.length<2){ $("startErr").textContent = "Please type your Last Name and First Name."; return; }
+  const SID = `${L}, ${F}`;
   if(!C){ $("startErr").textContent = "Please type the Exam Code."; return; }
   $("bStart").disabled = true; $("bStart").textContent = "Checking code…";
   try{ BANKDATA = await unlock(C); }
   catch(e){ $("startErr").textContent = "Wrong Exam Code. Ask your teacher."; $("bStart").disabled=false; $("bStart").textContent="Continue"; return; }
   $("bStart").disabled=false; $("bStart").textContent="Continue";
-  EXAMCODE = C; student = {code:SID};
+  EXAMCODE = C; student = {name:SID};
   // resume an unfinished exam on this device for the same student
   const act = ls.get(LS_ACTIVE, null);
-  if(act && act.student.code===SID){
+  if(act && act.student.name && act.student.name.toLowerCase()===SID.toLowerCase()){
     exam = act; mode = "real"; openExam(); return;
   }
-  $("hiName").textContent = SID;
+  $("hiName").textContent = F;
   show("sTrialIntro");
 };
 
 /* ===== exam engine ===== */
 function newRealExam(){
   const si = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 2**32 * BANKDATA.sets.length);
-  return { id: uid(), student, setIndex: si, setName: BANKDATA.sets[si].name, answers: Array(BANKDATA.sets[si].items.length).fill(null), started: Date.now() };
+  return { id: uid(), student, setIndex: si, setName: BANKDATA.sets[si].name, answers: Array(BANKDATA.sets[si].items.length).fill(null), started: Date.now(), flags: [] };
 }
 function items(){ return mode==="trial" ? TRIAL.items : BANKDATA.sets[exam.setIndex].items; }
 function openExam(){
   cur = 0;
   $("exTitle").textContent = mode==="trial" ? "PRACTICE (not graded)" : exam.setName;
-  $("exWho").textContent = exam.student.code;
+  $("exWho").textContent = exam.student.name;
   $("exStart").textContent = fmtTime(new Date(exam.started));
   show("sExam"); render();
 }
@@ -425,6 +421,22 @@ function drawCoach(){
 addEventListener("resize", () => drawCoach());
 addEventListener("scroll", () => { if(coachStep>=0) drawCoach(); }, {passive:true});
 
+/* ===== cheating flags (logged only, real exam only) ===== */
+let lastFlag = {k:"", at:0};
+function flag(kind){
+  if(mode!=="real" || !exam || !exam.flags || $("sExam").classList.contains("hidden")) return;
+  const now = Date.now();
+  if(lastFlag.k===kind && now-lastFlag.at < 1500) return;   // ignore duplicate bursts
+  lastFlag = {k:kind, at:now};
+  exam.flags.push({t: fmtTime(new Date(now)), k: kind});
+  ls.set(LS_ACTIVE, exam);
+}
+document.addEventListener("visibilitychange", () => { if(document.hidden) flag("left app/tab"); });
+addEventListener("blur", () => { setTimeout(() => { if(!document.hidden) flag("lost focus"); }, 300); });
+["copy","cut","paste"].forEach(ev => document.addEventListener(ev, () => flag(ev)));
+document.addEventListener("contextmenu", () => flag("right-click/long-press"));
+addEventListener("pagehide", () => flag("closed/reloaded app"));
+
 /* ===== finish & save ===== */
 async function finishReal(){
   const it = BANKDATA.sets[exam.setIndex].items, salt = BANKDATA.keySalt;
@@ -438,7 +450,9 @@ async function finishReal(){
   const s = exam.student;
   const rec = {
     id: exam.id, date: fmtDate(t1),
-    code: s.code,
+    name: s.name,
+    flags: (exam.flags||[]).length,
+    flagDetails: (exam.flags||[]).map(f=>`${f.t} ${f.k}`).join("; "),
     set: exam.setName, score, total: it.length, percent: Math.round(score/it.length*1000)/10,
     timeStarted: fmtTime(t1), timeEnded: fmtTime(t2), duration: fmtDur(t2-t1),
     answers: exam.answers.map((a,i)=>`${i+1}:${a===null?"-":"ABCD"[a]}`).join(" "),
@@ -450,7 +464,7 @@ async function finishReal(){
   const done = ls.get(LS_DONE, []); done.push(Object.assign({qr:packed}, rec)); ls.set(LS_DONE, done.slice(-200));
   ls.del(LS_ACTIVE);
   $("rScore").textContent = `${score} / ${it.length}`;
-  $("rName").textContent = s.code; $("rSet").textContent = exam.setName;
+  $("rName").textContent = s.name; $("rSet").textContent = exam.setName; $("rFlags").textContent = rec.flags;
   drawResultQR(packed);
   $("rDate").textContent = rec.date; $("rT1").textContent = rec.timeStarted; $("rT2").textContent = rec.timeEnded; $("rDur").textContent = rec.duration;
   setUpPill("warn","Saved on device · uploading…");
@@ -460,7 +474,7 @@ async function finishReal(){
   setUpPill(still?"warn":"ok", still ? "Saved on device · will upload when online" : "Uploaded ✓");
 }
 function setUpPill(cls, txt){ const p=$("rUp"); p.className="pill "+cls; p.textContent=txt; }
-$("bDone").onclick = () => { ["fSid","fCode"].forEach(i=>$(i).value=""); BANKDATA=null; exam=null; refreshStatus(); show("sStart"); };
+$("bDone").onclick = () => { ["fLast","fFirst","fCode"].forEach(i=>$(i).value=""); BANKDATA=null; exam=null; refreshStatus(); show("sStart"); };
 
 /* ===== result QR (AES-GCM, key from exam code) ===== */
 async function qrKey(code, salt){
@@ -469,18 +483,18 @@ async function qrKey(code, salt){
 }
 const toB64 = u8 => btoa(String.fromCharCode(...u8));
 async function packRecord(rec){
-  const compact = [rec.id, rec.code, rec.date, rec.set, rec.score, rec.total, rec.timeStarted, rec.timeEnded, rec.duration, rec.answers, rec.marks];
+  const compact = [rec.id, rec.name, rec.date, rec.set, rec.score, rec.total, rec.timeStarted, rec.timeEnded, rec.duration, rec.answers, rec.marks, rec.flags, rec.flagDetails];
   const salt = crypto.getRandomValues(new Uint8Array(8)), iv = crypto.getRandomValues(new Uint8Array(12));
   const ct = new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM", iv}, await qrKey(EXAMCODE, salt), new TextEncoder().encode(JSON.stringify(compact))));
-  return "MEPF1." + toB64(salt) + "." + toB64(iv) + "." + toB64(ct);
+  return "MEPF2." + toB64(salt) + "." + toB64(iv) + "." + toB64(ct);
 }
 async function unpackRecord(txt, code){
   const p = txt.trim().split(".");
-  if(p.length!==4 || p[0]!=="MEPF1") throw new Error("Not a Math Enhancement result QR.");
+  if(p.length!==4 || p[0]!=="MEPF2") throw new Error("Not a Math Enhancement result QR.");
   const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64(p[2])}, await qrKey(code, b64(p[1])), b64(p[3]));
   const a = JSON.parse(new TextDecoder().decode(pt));
-  return {id:a[0], code:a[1], date:a[2], set:a[3], score:a[4], total:a[5], percent:Math.round(a[4]/a[5]*1000)/10,
-          timeStarted:a[6], timeEnded:a[7], duration:a[8], answers:a[9], marks:a[10], device:"QR scan"};
+  return {id:a[0], name:a[1], date:a[2], set:a[3], score:a[4], total:a[5], percent:Math.round(a[4]/a[5]*1000)/10,
+          timeStarted:a[6], timeEnded:a[7], duration:a[8], answers:a[9], marks:a[10], flags:a[11], flagDetails:a[12], device:"QR scan"};
 }
 function drawResultQR(packed){
   const qr = qrcode(0, "L"); qr.addData(packed); qr.make();
@@ -522,10 +536,10 @@ async function handleScan(txt){
   try{ rec = await unpackRecord(txt, scanCode); }
   catch(e){ logScan(`<span style="color:var(--bad)">✗ Not a valid result QR</span>`); return; }
   const q = ls.get(LS_QUEUE, []), seen = ls.get(LS_DONE, []);
-  if(q.some(r=>r.id===rec.id) || seen.some(r=>r.id===rec.id)){ logScan(`↺ <b>${esc(rec.code)}</b> already scanned`); return; }
+  if(q.some(r=>r.id===rec.id) || seen.some(r=>r.id===rec.id)){ logScan(`↺ <b>${esc(rec.name)}</b> already scanned`); return; }
   q.push(rec); ls.set(LS_QUEUE, q); seen.push(rec); ls.set(LS_DONE, seen.slice(-500));
   if(navigator.vibrate) navigator.vibrate(80);
-  logScan(`✓ <b>${esc(rec.code)}</b> · ${esc(rec.set)} · <b>${rec.score}/${rec.total}</b>`);
+  logScan(`✓ <b>${esc(rec.name)}</b> · ${esc(rec.set)} · <b>${rec.score}/${rec.total}</b>`);
   syncNow();
 }
 function logScan(h){ const d=document.createElement("div"); d.style.padding="6px 0"; d.style.borderBottom="1px solid var(--pink-soft)"; d.innerHTML=h; $("tLog").prepend(d); $("tCount").textContent = ls.get(LS_QUEUE,[]).length; }
@@ -559,7 +573,7 @@ $("bSync").onclick = syncNow;
 function lastOwn(){ return ls.get(LS_DONE, []).filter(r=>r.qr).pop(); }
 $("bLast").onclick = () => {
   const r = lastOwn(); if(!r) return;
-  $("rScore").textContent = `${r.score} / ${r.total}`; $("rName").textContent = r.code; $("rSet").textContent = r.set;
+  $("rScore").textContent = `${r.score} / ${r.total}`; $("rName").textContent = r.name; $("rSet").textContent = r.set; $("rFlags").textContent = r.flags;
   $("rDate").textContent = r.date; $("rT1").textContent = r.timeStarted; $("rT2").textContent = r.timeEnded; $("rDur").textContent = r.duration;
   const pending = ls.get(LS_QUEUE, []).some(x=>x.id===r.id);
   setUpPill(pending?"warn":"ok", pending ? "Saved on device · will upload when online" : "Uploaded ✓");
