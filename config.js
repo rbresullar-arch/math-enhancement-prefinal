@@ -47,6 +47,23 @@ const EXAMS = [
       "The proctor will handle your questions. Raise your hand, say “Excuse me, ma’am/sir”.",
       "No borrowing of calculators allowed. Use your own scientific calculator."
     ]
+  },
+  {
+    id: "abstract-reasoning-finals",
+    title: "Abstract Reasoning — Finals",
+    topic: "Series · Analogy · Odd One Out · Matrix · Mirror and Rotation",
+    info: "30 items · 30 points · 60 minutes",
+    bank: "exams/abstract-reasoning-finals.enc.js",
+    minutes: 60,
+    shuffle: true,
+    points: { "Series": 1, "Analogy": 1, "Odd One Out": 1, "Matrix": 1, "Mirror and Rotation": 1 },
+    rules: [
+      "Each item has a picture. Look at it carefully, then tap the letter of your choice.",
+      "No alteration of answers allowed. Once submitted, answers can no longer be changed.",
+      "Cheating/coaching deemed by the proctor will forfeit your entry for the examination.",
+      "Keep the exam page open. Do not refresh, close, or switch to other apps or browser tabs.",
+      "The proctor will handle your questions. Raise your hand, say “Excuse me, ma’am/sir”."
+    ]
   }
 ];
 

@@ -74,6 +74,8 @@ table.qt{border-collapse:collapse;margin:0 0 12px;font-size:.95rem;font-variant-
 table.qt th,table.qt td{border:1px solid var(--line);padding:6px 10px;text-align:center}
 table.qt th{background:var(--pink-soft);color:var(--pink-dark)}
 .qtwrap{overflow-x:auto}
+.qfig{margin:0 0 10px;text-align:center}.qfig svg{max-width:100%;height:auto}
+#choices.img{display:grid;grid-template-columns:1fr 1fr;gap:10px}#choices.img .choice{margin:0;align-items:center;justify-content:center;position:relative;padding:10px}#choices.img .ltr{position:absolute;top:8px;left:8px;flex:none;width:28px;height:28px}#choices.img svg{width:100%;max-width:120px;height:auto;display:block}
 ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
 .hl{background:#fff3a8;padding:0 4px;border-radius:4px;font-weight:700}
 /* practice guide */
@@ -154,6 +156,7 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
     <div class="bar"><b id="qNum"></b><span id="qType" class="qtype"></span></div>
     <div id="qText" class="qtext"></div>
     <div id="qTable" class="qtwrap"></div>
+    <div id="qFig" class="qfig"></div>
     <div id="choices"></div>
     <div class="nav"><button id="bPrev" class="btn2">◀ Back</button><button id="bNext" class="btn">Next ▶</button></div>
   </div>
@@ -422,7 +425,10 @@ function render(){
   $("qType").textContent = mode==="practice" ? "practice" : `${q.type} · ${EXAM.points[q.type]||1} pt${(EXAM.points[q.type]||1)>1?"s":""}`;
   $("qText").textContent = q.q;
   $("qTable").innerHTML = q.t ? `<table class="qt"><tr>${q.t.h.map(h=>`<th>${esc(h)}</th>`).join("")}</tr>${q.t.r.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</table>` : "";
-  $("choices").innerHTML = q.o.map((o,i)=>`<button class="choice${A[cur]===i?" sel":""}" data-i="${i}"><span class="ltr">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`).join("");
+  $("qFig").innerHTML = q.f || "";   // figure (SVG from the encrypted bank)
+  const isImg = o => /^<svg[\s>]/.test(o);
+  $("choices").classList.toggle("img", q.o.every(isImg));
+  $("choices").innerHTML = q.o.map((o,i)=>`<button class="choice${A[cur]===i?" sel":""}" data-i="${i}"><span class="ltr">${"ABCD"[i]}</span><span>${isImg(o) ? o : esc(o)}</span></button>`).join("");
   $("choices").querySelectorAll(".choice").forEach(b => b.onclick = () => { A[cur] = +b.dataset.i; if(mode==="real") ls.set(K.active, att); render(); coachEvent("pick"); });
   $("bPrev").disabled = cur===0;
   $("bNext").textContent = cur===n-1 ? "Done ▶" : "Next ▶";
