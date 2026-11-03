@@ -75,7 +75,7 @@ const CODE_MINUTES = 90;
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
   { v: "1.4", date: "2026-11-03", notes: ["Separate Examinations and Quizzes buttons on the home page.", "Version history added."] },
-  { v: "1.3", date: "2026-11-03", notes: ["Abstract Reasoning — Finals quiz (30 picture items).", "Questions and choices can now show figures.", "Code prompt renamed to “Quiz Code”."] },
+  { v: "1.3", date: "2026-11-03", notes: ["Abstract Reasoning — Finals quiz (30 picture items).", "Questions and choices can now show figures.", "Code prompt reads “Quiz Code” for quizzes, “Exam Code” for examinations."] },
   { v: "1.2", date: "2026-10-23", notes: ["Math in the Modern World — Prelim exam added."] },
   { v: "1.1", date: "2026-10-12", notes: ["Math in the Modern World exam added (shuffled questions and choices).", "Scores submitted on other devices now show on the home page."] },
   { v: "1.0", date: "2026-10-12", notes: ["First release: name entry, offline download and install, session codes, flag logging.", "Math Enhancement exam."] }
