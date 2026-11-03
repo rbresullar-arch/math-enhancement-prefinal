@@ -80,7 +80,11 @@ table.qt th,table.qt td{border:1px solid var(--line);padding:6px 10px;text-align
 table.qt th{background:var(--pink-soft);color:var(--pink-dark)}
 .qtwrap{overflow-x:auto}
 .qfig{margin:0 0 10px;text-align:center}.qfig svg{max-width:100%;height:auto}
-#choices.img{display:grid;grid-template-columns:1fr 1fr;gap:10px}#choices.img .choice{margin:0;align-items:center;justify-content:center;position:relative;padding:10px}#choices.img .ltr{position:absolute;top:8px;left:8px;flex:none;width:28px;height:28px}#choices.img svg{width:100%;max-width:120px;height:auto;display:block}
+.img{display:grid;grid-template-columns:1fr 1fr;gap:10px}.img .choice{margin:0;align-items:center;justify-content:center;position:relative;padding:10px}.img .ltr{position:absolute;top:8px;left:8px;flex:none;width:28px;height:28px}.img svg{width:100%;max-width:120px;height:auto;display:block}
+.rv .qtext{margin:6px 0 10px}.rvo .choice{cursor:default}.rvo .choice.right{border-color:var(--ok);background:var(--ok-soft)}.rvo .choice.right .ltr{background:var(--ok);color:#fff}
+.rvo .choice.wrong{border-color:var(--bad);background:#fdecea}.rvo .choice.wrong .ltr{background:var(--bad);color:#fff}
+.rvo .tag{display:block;font-size:.8rem;font-weight:700;margin-top:4px}.rvo .right .tag{color:var(--ok)}.rvo .wrong .tag{color:var(--bad)}.rvo .img .tag{text-align:center}
+.pill.bad{background:#fdecea;color:var(--bad)}.expl{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--pink-soft);font-size:.95rem}
 ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
 .hl{background:#fff3a8;padding:0 4px;border-radius:4px;font-weight:700}
 /* practice guide */
@@ -205,6 +209,7 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
     </table>
     <p class="muted" style="margin-top:10px">No internet? Your result is saved on this phone and uploads by itself the next time you open the app online.</p>
   </div>
+  <div id="rReview" class="hidden"><h2 style="margin-top:22px">Review your answers</h2><div id="rvList"></div></div>
   <button id="bDone" class="btn2 full">Done</button>
 </section>
 
@@ -512,6 +517,24 @@ document.addEventListener("contextmenu", () => flag("long-press/right-click"));
 addEventListener("pagehide", () => flag("closed app"));
 
 /* ---------- 6. finish ---------- */
+function renderReview(rv){
+  $("rReview").classList.toggle("hidden", !rv.length);
+  const isImg = o => /^<svg[\s>]/.test(o);
+  $("rvList").innerHTML = rv.map(({v, picked, right}, i) => {
+    const ok = picked !== null && picked === right;
+    const pill = picked === null ? `<span class="pill warn">No answer</span>` : ok ? `<span class="pill ok">Correct ✓</span>` : `<span class="pill bad">Wrong ✗</span>`;
+    const img = v.o.every(isImg);
+    const opts = v.o.map((o, j) => {
+      const cls = j === right ? " right" : j === picked ? " wrong" : "";
+      const tag = j === right ? (j === picked ? "✓ Your answer — correct" : "✓ Correct answer") : j === picked ? "✗ Your answer" : "";
+      return `<div class="choice${cls}"><span class="ltr">${"ABCD"[j]}</span><span>${img ? o : esc(o)}${tag ? `<span class="tag">${tag}</span>` : ""}</span></div>`;
+    }).join("");
+    return `<div class="card rv"><div class="bar"><b>Question ${i+1}</b>${pill}</div>
+      <div class="qtext">${esc(v.q)}</div>${v.f ? `<div class="qfig">${v.f}</div>` : ""}
+      <div class="rvo"><div class="${img ? "img" : ""}">${opts}</div></div>
+      ${v.x ? `<div class="expl"><b>Why:</b> ${esc(v.x)}</div>` : ""}</div>`;
+  }).join("");
+}
 let scoreCache = null;
 function record(status){
   const t1 = new Date(att.started), t2 = att.ended ? new Date(att.ended) : null, s = scoreCache || {};
@@ -537,6 +560,14 @@ async function finish(auto){
     const ok = a!==null && (await sha(`${salt}|${att.setIndex}|${v.qi}|${v.o[a]}`)) === v.k;
     if(ok){ score += pts; marks[v.qi] = "✓"; }
   }
+  // quizzes: show correct answers + explanations after submitting (set review:false in config.js to turn off)
+  const showReview = EXAM.kind === "quiz" && EXAM.review !== false;
+  let rv = [];
+  if(showReview) for(let i=0;i<VIEW.length;i++){
+    const v = VIEW[i]; let right = -1;
+    for(let j=0;j<v.o.length;j++) if((await sha(`${salt}|${att.setIndex}|${v.qi}|${v.o[j]}`)) === v.k){ right = j; break; }
+    rv.push({v, picked: att.answers[i], right});
+  }
   att.ended = Date.now();
   scoreCache = {score, total, percent:Math.round(score/total*1000)/10, marks:marks.join("")};
   const rec = record(auto ? "Submitted (time up)" : "Submitted");
@@ -546,6 +577,7 @@ async function finish(auto){
   $("rScore").textContent = `${score} / ${total}`;
   $("rName").textContent = att.name; $("rExam").textContent = att.examTitle; $("rSet").textContent = att.setName;
   $("rDate").textContent = rec.date; $("rT1").textContent = rec.timeStarted; $("rT2").textContent = rec.timeEnded + (auto ? " (time up)" : "");
+  renderReview(rv);
   setUp(); show("sResult");
   await syncNow(); setUp();
   scoreCache = null;
