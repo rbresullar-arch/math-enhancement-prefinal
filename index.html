@@ -3,36 +3,38 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Prefinal Examination</title>
-<meta name="theme-color" content="#d63384">
+<title>Mathematics</title>
+<meta name="theme-color" content="#fde7f1">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192-v2.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icon-180-v2.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Prefinal Exam">
+<meta name="apple-mobile-web-app-title" content="Mathematics">
 <style>
 :root{
-  --pink:#d63384; --pink-dark:#a61e64; --pink-soft:#fde4f0; --line:#f3c4d9;
-  --bg:#fff7fb; --ink:#2b1a24; --muted:#7a5c6c;
+  --pink:#ee7fb0; --pink-dark:#9c2a63; --pink-soft:#fde9f2; --line:#f7d6e5;
+  --bg:#fff8fb; --ink:#3a1f2d; --muted:#8a6777;
+  --btn:#f6b1cf; --btn2:#f19bc1; --btn-ink:#4a1033; --shadow:0 10px 28px -16px rgba(196,62,128,.45);
   --ok:#1f8a4c; --ok-soft:#e3f6ea; --warn:#9a5b00; --warn-soft:#fff3d6; --bad:#c0392b;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+html,body{margin:0;background:var(--bg) linear-gradient(180deg,#ffe6f1 0,var(--bg) 260px) no-repeat;color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
 body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
 .wrap{max-width:640px;margin:0 auto;padding:20px 16px 32px}
-h1{font-size:1.35rem;letter-spacing:.06em;margin:0;color:var(--pink-dark)}
+h1{font-size:1.7rem;font-weight:800;letter-spacing:-.01em;margin:0;color:var(--pink-dark)}
 h2{font-size:1.15rem;margin:0 0 .5em;color:var(--pink-dark)}
 p{margin:.4em 0}
 .sub{color:var(--muted);margin:2px 0 18px}
-.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin:12px 0}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;margin:12px 0;box-shadow:var(--shadow)}
 .muted{color:var(--muted);font-size:.92rem}
 label{display:block;font-weight:600;margin:12px 0 4px}
-input{width:100%;font:inherit;padding:12px 14px;border:2px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+input{width:100%;font:inherit;padding:12px 14px;border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--ink)}
 input:focus{outline:none;border-color:var(--pink)}
-button{font:inherit;font-weight:600;border:0;border-radius:12px;padding:12px 18px;cursor:pointer;min-height:48px}
-.btn{background:var(--pink);color:#fff}
-.btn:active{background:var(--pink-dark)}
-.btn2{background:#fff;color:var(--pink-dark);border:2px solid var(--pink)}
+button{font:inherit;font-weight:700;border:0;border-radius:14px;padding:12px 18px;cursor:pointer;min-height:48px}
+.btn{background:linear-gradient(135deg,var(--btn),var(--btn2));color:var(--btn-ink);box-shadow:0 8px 18px -10px rgba(214,51,132,.7)}
+.btn:active{filter:brightness(.95);transform:translateY(1px)}
+.btn2{background:#fff;color:var(--pink-dark);border:2px solid var(--line)}
+.btn2:active{background:var(--pink-soft)}
 button:disabled{opacity:.45;cursor:not-allowed}
 .full{width:100%}
 .row{display:flex;gap:10px}
@@ -49,25 +51,37 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .exam .actions button{flex:1}
 .status{font-size:.9rem;color:var(--muted);text-align:center;margin-top:18px}
 .tabs{display:flex;gap:10px;margin:4px 0 6px}.tabs button{flex:1;white-space:nowrap;padding:12px 6px;font-size:.95rem;background:#fff;border:2px solid var(--line);color:var(--pink-dark)}
-.tabs button.on{background:var(--pink);border-color:var(--pink);color:#fff}.tabs .n{opacity:.8;font-weight:500}
+.tabs button.on{background:linear-gradient(135deg,var(--btn),var(--btn2));border-color:transparent;color:var(--btn-ink)}.tabs .n{opacity:.8;font-weight:500}
 .empty{text-align:center;color:var(--muted)}
 .ver{margin-top:22px;font-size:.88rem;color:var(--muted)}.ver summary{cursor:pointer;text-align:center;font-weight:600}
 .ver h3{font-size:.92rem;margin:12px 0 2px;color:var(--ink)}.ver ul{margin:2px 0;padding-left:20px}
+/* subject selection */
+.hello{color:var(--muted);margin:4px 0 2px}
+.pick{font-size:.8rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);margin:22px 0 4px}
+.subj{display:flex;align-items:center;gap:16px;width:100%;text-align:left;padding:20px 18px;margin:12px 0;border-radius:24px;color:var(--ink);font-weight:500;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.7);transition:transform .15s ease}
+.subj:active{transform:scale(.98)}
+.subj.s0{background:linear-gradient(135deg,#ffe1ee,#fbc9de)}
+.subj.s1{background:linear-gradient(135deg,#fde6f6,#f2cdea)}
+.subj .ic{flex:0 0 56px;height:56px;border-radius:18px;background:rgba(255,255,255,.85);display:grid;place-items:center;font-size:1.7rem;font-weight:800;color:var(--pink-dark)}
+.subj .tx{flex:1;min-width:0}.subj .t{display:block;font-weight:800;font-size:1.15rem;color:var(--pink-dark)}
+.subj .m{display:block;font-size:.88rem;color:var(--muted);margin-top:2px}
+.subj .go{font-size:1.6rem;color:var(--pink-dark);opacity:.6}
+.back{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.8);border:1px solid var(--line);color:var(--pink-dark);border-radius:99px;padding:6px 14px;min-height:0;font-size:.9rem;margin-bottom:12px}
 /* exam */
 .top{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line)}
 .timer{font-variant-numeric:tabular-nums;font-weight:700}
 .timer.low{color:var(--bad)}
 .qtype{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
 .qtext{font-size:1.12rem;margin:8px 0 12px}
-.choice{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;background:#fff;border:2px solid var(--line);color:var(--ink);font-weight:500;margin:8px 0;padding:13px}
+.choice{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;background:#fff;border:2px solid var(--line);border-radius:16px;color:var(--ink);font-weight:500;margin:8px 0;padding:13px}
 .choice .ltr{flex:0 0 32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--pink-soft);color:var(--pink-dark);font-weight:700}
 .choice.sel{border-color:var(--pink);background:var(--pink-soft)}
-.choice.sel .ltr{background:var(--pink);color:#fff}
+.choice.sel .ltr{background:var(--pink-dark);color:#fff}
 .nav{display:flex;gap:10px;margin-top:12px}
 .nav button{flex:1}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:8px}
 .grid button{padding:0;min-height:42px;background:#fff;border:2px solid var(--line);color:var(--ink)}
-.grid button.ans{background:var(--pink);border-color:var(--pink);color:#fff}
+.grid button.ans{background:var(--btn);border-color:var(--btn2);color:var(--btn-ink)}
 .grid button.cur{outline:3px solid var(--pink-dark);outline-offset:2px}
 .modal{position:fixed;inset:0;background:rgba(43,26,36,.55);display:grid;place-items:center;padding:16px;z-index:50}
 .modal .card{max-width:420px;width:100%}
@@ -92,7 +106,7 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
 #coach .block{position:fixed;inset:0;pointer-events:auto}
 .coach-lift{position:relative;z-index:41}
 #coach .ring{position:fixed;border:4px solid #ffd43b;border-radius:14px;box-shadow:0 0 0 9999px rgba(43,26,36,.6);transition:all .2s ease;pointer-events:none}
-#coach .tip{position:fixed;left:16px;right:16px;max-width:500px;margin:0 auto;background:#fff;border:3px solid var(--pink);border-radius:16px;padding:14px 16px;pointer-events:auto;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+#coach .tip{position:fixed;left:16px;right:16px;max-width:500px;margin:0 auto;background:#fff;border:3px solid var(--btn2);border-radius:16px;padding:14px 16px;pointer-events:auto;box-shadow:0 8px 30px rgba(0,0,0,.25)}
 #coach .step{font-size:.78rem;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:.05em}
 #coach .say{font-size:1.05rem;margin:6px 0 12px}
 #coach .act{display:flex;gap:8px;align-items:center}
@@ -103,7 +117,7 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
 
 <!-- 1. NAME -->
 <section id="sName" class="wrap">
-  <h1>PREFINAL EXAMINATION</h1>
+  <h1>Mathematics</h1>
   <p class="sub">Type your name to begin.</p>
   <div class="card">
     <div class="row">
@@ -115,18 +129,30 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
   </div>
 </section>
 
-<!-- 2. HOME -->
-<section id="sHome" class="wrap hidden">
-  <h1>PREFINAL EXAMINATION</h1>
-  <p class="sub">Hi, <b id="hiName"></b> · <button id="bNotMe" class="link">not you?</button></p>
-  <div class="tabs"><button id="tExam" data-k="exam">Examinations</button><button id="tQuiz" data-k="quiz">Quizzes</button></div>
-  <div id="examList"></div>
-  <div class="card hidden" id="iosTip"><p class="muted">📱 <b>iPhone/iPad:</b> tap <b>Share</b> then <b>Add to Home Screen</b>, and open the exam from the new icon. This keeps it saved for offline use.</p></div>
+<!-- 2a. SUBJECT -->
+<section id="sSubj" class="wrap hidden">
+  <h1>Mathematics</h1>
+  <p class="hello">Hi, <b id="hiName"></b> · <button id="bNotMe" class="link">not you?</button></p>
+  <div class="pick">Choose a subject</div>
+  <div id="subjList"></div>
+  <div class="card hidden" id="iosTip"><p class="muted">📱 <b>iPhone/iPad:</b> tap <b>Share</b> then <b>Add to Home Screen</b>, and open the app from the new icon. This keeps it saved for offline use.</p></div>
   <button id="bInstall" class="btn2 full hidden">Install app on this device</button>
-  <div class="status"><span id="netPill" class="pill">…</span> <span id="queueMsg"></span> <button id="bSync" class="link hidden">Upload now</button></div>
+  <div class="status"><span class="pill netPill">…</span> <span class="queueMsg"></span> <button class="link bSync hidden">Upload now</button></div>
+  <p class="muted dlMsg" style="text-align:center;margin:4px 0 0"></p>
   <button id="bUpdate" class="btn2 full" style="margin-top:18px">⟳ Check for updates</button>
   <p id="updMsg" class="muted" style="text-align:center;margin:6px 0 0"></p>
   <details class="ver card"><summary id="verSum"></summary><div id="verList"></div></details>
+</section>
+
+<!-- 2b. HOME (one subject) -->
+<section id="sHome" class="wrap hidden">
+  <button id="bSubjBack" class="back">‹ Subjects</button>
+  <h1 id="subjTitle"></h1>
+  <p class="sub" id="subjSub"></p>
+  <div class="tabs"><button id="tExam" data-k="exam">Examinations</button><button id="tQuiz" data-k="quiz">Quizzes</button></div>
+  <div id="examList"></div>
+  <div class="status"><span class="pill netPill">…</span> <span class="queueMsg"></span> <button class="link bSync hidden">Upload now</button></div>
+  <p class="muted dlMsg" style="text-align:center;margin:4px 0 0"></p>
 </section>
 
 <!-- 3. CODE -->
@@ -223,13 +249,14 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
 "use strict";
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
+const $all = sel => document.querySelectorAll(sel);
 const show = id => { document.querySelectorAll("body>section").forEach(s => s.classList.add("hidden")); $(id).classList.remove("hidden"); scrollTo(0,0); };
 const ls = {
   get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } },
   set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} },
   del(k){ try{ localStorage.removeItem(k); }catch(e){} }
 };
-const K = { tab:"pf_tab", name:"pf_name", queue:"pf_queue", active:"pf_active", done:"pf_done", codes:"pf_codes" };
+const K = { subj:"pf_subj", tab:"pf_tab", name:"pf_name", queue:"pf_queue", active:"pf_active", done:"pf_done", codes:"pf_codes" };
 const pad = n => String(n).padStart(2,"0");
 const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const fmtTime = d => { let h=d.getHours(), ap=h<12?"AM":"PM"; h=h%12||12; return `${h}:${pad(d.getMinutes())}:${pad(d.getSeconds())} ${ap}`; };
@@ -255,34 +282,55 @@ $("bName").onclick = () => {
   if(L.length<2 || F.length<2){ $("nameErr").textContent = "Please type your Last Name and First Name."; return; }
   NAME = `${L}, ${F}`; ls.set(K.name, NAME);
   enqueue({kind:"checkin", id:uid(), name:NAME, at:new Date().toISOString(), device:navigator.userAgent.slice(0,100)});
-  goHome();
+  goSubjects();
 };
 $("bNotMe").onclick = () => { ls.del(K.name); NAME=""; $("fLast").value=""; $("fFirst").value=""; show("sName"); };
+
+/* ---------- 2a. subject selection ---------- */
+const subjOf = e => e.subject || SUBJECTS[0].id;
+const kindOf = e => e.kind === "quiz" ? "quiz" : "exam";
+const plural = (n, w) => `${n} ${w}${n === 1 ? "" : (w === "quiz" ? "zes" : "s")}`;
+function goSubjects(){
+  $("hiName").textContent = NAME;
+  const box = $("subjList"); box.innerHTML = "";
+  SUBJECTS.forEach((sb, i) => {
+    const list = EXAMS.filter(e => subjOf(e) === sb.id);
+    const nE = list.filter(e => kindOf(e) === "exam").length, nQ = list.filter(e => kindOf(e) === "quiz").length;
+    const b = document.createElement("button"); b.className = `subj s${i % 2}`;
+    b.innerHTML = `<span class="ic">${esc(sb.icon || "∑")}</span><span class="tx"><span class="t">${esc(sb.title)}</span><span class="m">${plural(nE,"exam")} · ${plural(nQ,"quiz")}</span></span><span class="go">›</span>`;
+    b.onclick = () => { ls.set(K.subj, sb.id); goHome(); };
+    box.appendChild(b);
+  });
+  refreshStatus(); show("sSubj");
+  autoDownload(); pullDone();
+}
+$("bSubjBack").onclick = goSubjects;
 
 /* ---------- 2. home ---------- */
 async function bankCached(e){ try{ return !!(await caches.match(e.bank, {ignoreSearch:true})); }catch(x){ return false; } }
 async function goHome(){
-  $("hiName").textContent = NAME;
+  const sb = SUBJECTS.find(x => x.id === ls.get(K.subj, "")) || SUBJECTS[0];
+  const inSubj = EXAMS.filter(e => subjOf(e) === sb.id);
+  $("subjTitle").textContent = sb.title; $("subjSub").textContent = `Hi, ${NAME}`;
   const done = ls.get(K.done, {});
   const box = $("examList"); box.innerHTML = "";
-  const kindOf = e => e.kind === "quiz" ? "quiz" : "exam";
   let tab = ls.get(K.tab, "exam"); if(tab !== "quiz") tab = "exam";
   for(const b of [$("tExam"), $("tQuiz")]){
-    const k = b.dataset.k, n = EXAMS.filter(e => kindOf(e) === k).length;
+    const k = b.dataset.k, n = inSubj.filter(e => kindOf(e) === k).length;
     b.innerHTML = `${k === "quiz" ? "Quizzes" : "Examinations"} <span class="n">(${n})</span>`;
     b.classList.toggle("on", k === tab);
     b.onclick = () => { ls.set(K.tab, k); goHome(); };
   }
-  const list = EXAMS.filter(e => kindOf(e) === tab);
+  const list = inSubj.filter(e => kindOf(e) === tab);
   if(!list.length) box.innerHTML = `<div class="card empty">No ${tab === "quiz" ? "quizzes" : "examinations"} yet.</div>`;
   for(const e of list){
     const d = done[nkey(e.id,NAME)], have = await bankCached(e);
     const el = document.createElement("div"); el.className = "card exam";
-    const pill = d ? `<span class="pill ok">Submitted ✓</span>` : have ? `<span class="pill ok">Available offline ✓</span>` : `<span class="pill warn">Not downloaded</span>`;
+    const pill = d ? `<span class="pill ok">Submitted ✓</span>` : have ? `<span class="pill ok">Available offline ✓</span>` : DL.has(e.id) ? `<span class="pill">Downloading…</span>` : `<span class="pill warn">Not downloaded</span>`;
     el.innerHTML = `<div class="bar"><h2>${esc(e.title)}</h2>${pill}</div>
       <p class="muted">${esc(e.topic)} · ${esc(e.info)}</p>
       ${d ? `<p>Your score: <b>${d.score} / ${d.total}</b></p>` : `<div class="actions">
-        ${have ? "" : `<button class="btn2" data-dl>Download</button>`}
+        ${have || DL.has(e.id) ? "" : `<button class="btn2" data-dl>Download</button>`}
         <button class="btn" data-go>Take ${kindOf(e)}</button></div>`}`;
     const dl = el.querySelector("[data-dl]"), go = el.querySelector("[data-go]");
     if(dl) dl.onclick = async () => { dl.disabled=true; dl.textContent="Downloading…"; const ok = await download(e); if(!ok){ dl.disabled=false; dl.textContent="Try again"; } else goHome(); };
@@ -290,8 +338,10 @@ async function goHome(){
     box.appendChild(el);
   }
   refreshStatus(); show("sHome");
-  pullDone();
+  autoDownload(); pullDone();
 }
+const onScreen = id => !$(id).classList.contains("hidden");
+const redraw = () => { if(onScreen("sHome")) goHome(); else if(onScreen("sSubj")) goSubjects(); };
 /* check for updates (also for iPhone home screen apps, which have no refresh button) */
 $("bUpdate").onclick = async () => {
   const b = $("bUpdate"), msg = $("updMsg");
@@ -333,19 +383,39 @@ async function pullDone(){
         if(!examById(id) || done[nkey(id,NAME)]) continue;
         done[nkey(id,NAME)] = {score:d.score, total:d.total, at:Date.now()}; changed = true;
       }
-      if(changed){ ls.set(K.done, done); if(!$("sHome").classList.contains("hidden")){ pulling = false; return goHome(); } }
+      if(changed){ ls.set(K.done, done); if(onScreen("sHome")){ pulling = false; return goHome(); } }
     }
   }catch(x){}
   pulling = false;
 }
-async function download(e){
-  if(!navigator.onLine){ alertBox("No internet", "Connect to the internet first, then tap Download."); return false; }
+async function download(e, silent){
+  if(!navigator.onLine){ if(!silent) alertBox("No internet", "Connect to the internet first, then tap Download."); return false; }
   try{
     const c = await caches.open("pf-exams");
     for(const f of [e.bank]){ const r = await fetch(f, {cache:"reload"}); if(!r.ok) throw 0; await c.put(f, r); }
     if(navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(()=>{});
     return true;
-  }catch(x){ alertBox("Download failed", "Check your internet and try again."); return false; }
+  }catch(x){ if(!silent) alertBox("Download failed", "Check your internet and try again."); return false; }
+}
+/* auto-download: every exam and quiz is saved on the device whenever it is online */
+const DL = new Set(); let autoBusy = false;
+async function autoDownload(){
+  if(autoBusy || !navigator.onLine || !("caches" in window)) return;
+  autoBusy = true;
+  try{
+    const need = []; for(const e of EXAMS) if(!(await bankCached(e))) need.push(e);
+    if(need.length){
+      need.forEach(e => DL.add(e.id)); $all(".dlMsg").forEach(x => x.textContent = `Saving ${plural(need.length, "file")} for offline use…`); redraw();
+      for(const e of need){ await download(e, true); DL.delete(e.id); }
+      const left = []; for(const e of EXAMS) if(!(await bankCached(e))) left.push(e);
+      $all(".dlMsg").forEach(x => x.textContent = left.length ? "Some files did not download. They will retry automatically." : "All exams and quizzes saved for offline use ✓");
+      redraw();
+    } else $all(".dlMsg").forEach(x => x.textContent = "All exams and quizzes saved for offline use ✓");
+    // remove old versions of exam files that are no longer listed
+    const c = await caches.open("pf-exams"), keep = EXAMS.map(e => new URL(e.bank, location.href).pathname);
+    for(const r of await c.keys()) if(!keep.includes(new URL(r.url).pathname)) await c.delete(r);
+  }catch(x){}
+  DL.clear(); autoBusy = false;
 }
 function loadBank(e){
   return new Promise((ok, no) => {
@@ -595,30 +665,65 @@ function enqueue(r){
   if(i>=0) q[i] = r; else q.push(r);
   ls.set(K.queue, q); syncNow();
 }
-let syncing = false;
+/* Each record is removed from the queue once the server accepts it, or once the server's
+   status shows that exam already submitted for that name (fixes "N waiting" after a
+   successful upload whose reply was lost, e.g. the phone left the app mid-upload). */
+const rkey = r => r.kind+"|"+r.id+"|"+(r.status||"");
+const isFinal = r => r.kind === "result" && /^Submitted/.test(r.status || "");
+const MAX_TRIES = 5;   // check-ins and "In progress" logs are dropped after this many failed tries
+async function post(body){
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 25000);
+  try{
+    const res = await fetch(API_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(body), signal:ctl.signal});
+    const j = await res.json().catch(() => null);
+    return !!(res.ok && j && (j.ok || j.success));
+  }catch(x){ return false; } finally{ clearTimeout(t); }
+}
+function dropSent(keys){ ls.set(K.queue, ls.get(K.queue,[]).filter(r => !keys.has(rkey(r)))); }
+async function confirmFromServer(){   // remove queued records the Sheet already has
+  const q = ls.get(K.queue, []); if(!q.length) return;
+  const names = [...new Set(q.filter(r => r.kind === "result").map(r => r.name))];
+  for(const name of names){
+    try{
+      const ctl = new AbortController(); setTimeout(() => ctl.abort(), 10000);
+      const j = await (await fetch(`${API_URL}?action=status&name=${encodeURIComponent(name)}`, {signal:ctl.signal})).json();
+      if(!(j && j.ok && j.done)) continue;
+      const titles = new Set(Object.keys(j.done).map(id => (examById(id) || {}).title).filter(Boolean));
+      const keys = new Set(ls.get(K.queue,[]).filter(r => r.kind === "result" && r.name === name && titles.has(r.exam)).map(rkey));
+      if(keys.size) dropSent(keys);
+    }catch(x){}
+  }
+}
+let syncing = false, syncAgain = false;
 async function syncNow(){
-  const q = ls.get(K.queue, []);
-  if(syncing){ while(syncing) await new Promise(r => setTimeout(r, 200)); return syncNow(); }
-  if(!q.length || !navigator.onLine || !API_URL.startsWith("https://")){ refreshStatus(); return; }
+  if(syncing){ syncAgain = true; return; }
+  if(!ls.get(K.queue, []).length || !navigator.onLine || !API_URL.startsWith("https://")){ refreshStatus(); return; }
   syncing = true;
   try{
-    const res = await fetch(API_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify({records:q})});
-    const j = await res.json();
-    if(j.ok){
-      const sent = new Set(q.map(r => r.kind+"|"+r.id+"|"+(r.status||"")));
-      ls.set(K.queue, ls.get(K.queue,[]).filter(r => !sent.has(r.kind+"|"+r.id+"|"+(r.status||""))));
+    const q = ls.get(K.queue, []);
+    if(await post({records:q})) dropSent(new Set(q.map(rkey)));
+    else {
+      // batch refused: send one by one so a single bad or duplicate record cannot block the rest
+      for(const r of ls.get(K.queue, [])){
+        if(await post({records:[r]})){ dropSent(new Set([rkey(r)])); continue; }
+        const all = ls.get(K.queue, []), x = all.find(y => rkey(y) === rkey(r)); if(!x) continue;
+        x.tries = (x.tries || 0) + 1;
+        ls.set(K.queue, isFinal(x) || x.tries < MAX_TRIES ? all : all.filter(y => y !== x));
+      }
+      await confirmFromServer();
     }
   }catch(x){}
   syncing = false; refreshStatus();
+  if(onScreen("sResult") && att) setUp();
+  if(syncAgain){ syncAgain = false; syncNow(); }
 }
 function refreshStatus(){
-  const n = ls.get(K.queue,[]).length, on = navigator.onLine, p = $("netPill");
-  p.className = "pill " + (on?"ok":"warn"); p.textContent = on ? "Online" : "Offline";
-  $("queueMsg").textContent = n ? `${n} waiting to upload` : "All saved ✓";
-  $("bSync").classList.toggle("hidden", !n || !on);
+  const n = ls.get(K.queue,[]).length, on = navigator.onLine;
+  $all(".netPill").forEach(p => { p.className = "pill netPill " + (on?"ok":"warn"); p.textContent = on ? "Online" : "Offline"; });
+  $all(".queueMsg").forEach(m => m.textContent = n ? `${n} waiting to upload` : "All saved ✓");
+  $all(".bSync").forEach(b => { b.classList.toggle("hidden", !n || !on); b.onclick = syncNow; });
 }
-$("bSync").onclick = syncNow;
-addEventListener("online", syncNow); addEventListener("offline", refreshStatus);
+addEventListener("online", () => { syncNow(); autoDownload(); }); addEventListener("offline", refreshStatus);
 setInterval(syncNow, 60000);
 
 /* ---------- practice guide ---------- */
@@ -673,14 +778,18 @@ if("serviceWorker" in navigator){
   // a newer app version took over: reload once, but never in the middle of an exam or quiz
   navigator.serviceWorker.addEventListener("controllerchange", () => {
     if(!hadSW || sessionStorage.getItem("pf_reloaded")) return;
-    if(!$("sName").classList.contains("hidden") || !$("sHome").classList.contains("hidden")){ sessionStorage.setItem("pf_reloaded","1"); location.reload(); }
+    if(onScreen("sName") || onScreen("sSubj") || onScreen("sHome")){ sessionStorage.setItem("pf_reloaded","1"); location.reload(); }
   });
 }
 
 /* ---------- boot ---------- */
 (function boot(){
   const act = ls.get(K.active, null);
-  if(NAME){ goHome().then(() => { if(act && act.name===NAME){ const e = examById(act.exam); if(e){ openCode(e); $("codeErr").textContent = `You have an unfinished ${noun(e)}. Type your code to continue.`; } } }); }
+  if(NAME){
+    const e = act && act.name===NAME && examById(act.exam);
+    if(e){ ls.set(K.subj, subjOf(e)); goHome().then(() => { openCode(e); $("codeErr").textContent = `You have an unfinished ${noun(e)}. Type your code to continue.`; }); }
+    else goSubjects();
+  }
   else show("sName");
   syncNow();
 })();

@@ -1,11 +1,11 @@
 {
-  "name": "Prefinal Examination",
-  "short_name": "Prefinal Exam",
+  "name": "Mathematics",
+  "short_name": "Mathematics",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#3b0764",
-  "theme_color": "#3b0764",
+  "theme_color": "#fde7f1",
   "icons": [
     {
       "src": "icon-192-v2.png",

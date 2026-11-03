@@ -2,11 +2,18 @@
 // Results upload (Google Apps Script web app, owner: gericabalangue@sec.edu.ph)
 const API_URL = "https://script.google.com/macros/s/AKfycbyiqxFMAFSW4ni5WNmBnz2YpBIqmfMRLOOLfw-DAWEVodnELaIT_KLiQqoAdtw-_82FTg/exec";
 
+// Subjects shown on the first screen. Each exam/quiz below has subject: one of these ids.
+const SUBJECTS = [
+  { id: "me",  title: "Math Enhancement",         icon: "∑" },
+  { id: "mmw", title: "Math in the Modern World", icon: "φ" }
+];
+
 // Exams shown on the home page. To add an exam: add an entry + its encrypted bank file in /exams.
 // kind: "exam" (default) is listed under Examinations, "quiz" under Quizzes.
 const EXAMS = [
   {
     id: "math-enhancement",
+    subject: "me",
     title: "Math Enhancement",
     topic: "Simple and Compound Interest",
     info: "15 items · 60 points",
@@ -15,6 +22,7 @@ const EXAMS = [
   },
   {
     id: "math-in-the-modern-world",
+    subject: "mmw",
     title: "Math in the Modern World",
     topic: "Apportionment and Voting · Mathematics of Finance",
     info: "40 items · 40 points · 60 minutes",
@@ -33,6 +41,7 @@ const EXAMS = [
   },
   {
     id: "mmw-prelim",
+    subject: "mmw",
     title: "Math in the Modern World — Prelim",
     topic: "Mathematics in Our World · Mathematical Language and Symbols · Problem-Solving Strategies",
     info: "40 items · 40 points · 60 minutes",
@@ -51,6 +60,7 @@ const EXAMS = [
   },
   {
     id: "abstract-reasoning-finals",
+    subject: "me",
     kind: "quiz",
     title: "Abstract Reasoning — Finals",
     topic: "Series · Analogy · Odd One Out · Matrix · Mirror and Rotation",
@@ -74,6 +84,7 @@ const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
+  { v: "2.1", date: "2026-11-04", notes: ["Renamed to Mathematics. Choose a subject first: Math Enhancement or Math in the Modern World.", "New pastel pink look and home screen icon.", "Exams and quizzes download by themselves whenever the phone is online.", "Fixed: “waiting to upload” no longer stays after results already reached the Google Sheet."] },
   { v: "2.0", date: "2026-11-03", notes: ["Math in the Modern World: 3 more exam codes (download the exam again)."] },
   { v: "1.9", date: "2026-11-03", notes: ["Abstract Reasoning — Finals: 5 quiz codes (download the quiz again)."] },
   { v: "1.8", date: "2026-11-03", notes: ["Quizzes: after submitting, students see the correct answers with a short explanation."] },
