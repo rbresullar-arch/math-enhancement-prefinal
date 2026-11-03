@@ -120,6 +120,8 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
   <div class="card hidden" id="iosTip"><p class="muted">📱 <b>iPhone/iPad:</b> tap <b>Share</b> then <b>Add to Home Screen</b>, and open the exam from the new icon. This keeps it saved for offline use.</p></div>
   <button id="bInstall" class="btn2 full hidden">Install app on this device</button>
   <div class="status"><span id="netPill" class="pill">…</span> <span id="queueMsg"></span> <button id="bSync" class="link hidden">Upload now</button></div>
+  <button id="bUpdate" class="btn2 full" style="margin-top:18px">⟳ Check for updates</button>
+  <p id="updMsg" class="muted" style="text-align:center;margin:6px 0 0"></p>
   <details class="ver card"><summary id="verSum"></summary><div id="verList"></div></details>
 </section>
 
@@ -285,6 +287,26 @@ async function goHome(){
   refreshStatus(); show("sHome");
   pullDone();
 }
+/* check for updates (also for iPhone home screen apps, which have no refresh button) */
+$("bUpdate").onclick = async () => {
+  const b = $("bUpdate"), msg = $("updMsg");
+  if(!navigator.onLine){ msg.textContent = "No internet. Connect first, then try again."; return; }
+  b.disabled = true; b.textContent = "Checking…"; msg.textContent = "";
+  try{
+    const r = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
+    if(r) await r.update().catch(()=>{});
+    const txt = await (await fetch("config.js?t=" + Date.now(), {cache:"no-store"})).text();
+    const latest = (txt.match(/v:\s*"([\d.]+)"/) || [])[1];
+    const mine = typeof VERSIONS !== "undefined" && VERSIONS.length ? VERSIONS[0].v : "";
+    if(latest && latest !== mine){
+      msg.textContent = `Updating to version ${latest}…`;
+      if("caches" in window) for(const k of await caches.keys()) if(k !== "pf-exams") await caches.delete(k);   // keep downloaded exams
+      setTimeout(() => location.reload(), 600); return;
+    }
+    msg.textContent = `You have the latest version (${mine}). ✓`;
+  }catch(x){ msg.textContent = "Could not check. Try again."; }
+  b.disabled = false; b.textContent = "⟳ Check for updates";
+};
 /* version history */
 (function(){
   if(typeof VERSIONS === "undefined" || !VERSIONS.length) return;

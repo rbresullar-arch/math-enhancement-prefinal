@@ -74,6 +74,7 @@ const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
+  { v: "1.7", date: "2026-11-03", notes: ["“Check for updates” button on the home page (for iPhone home screen apps)."] },
   { v: "1.6", date: "2026-11-03", notes: ["App updates now load right away (no stale copy after an update)."] },
   { v: "1.5", date: "2026-11-03", notes: ["Screens and messages say “quiz” or “exam” to match what is being taken.", "Abstract Reasoning item 9: clearer answer choices (download the quiz again)."] },
   { v: "1.4", date: "2026-11-03", notes: ["Separate Examinations and Quizzes buttons on the home page.", "Version history added."] },
