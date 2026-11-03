@@ -18,7 +18,7 @@ const EXAMS = [
     title: "Math in the Modern World",
     topic: "Apportionment and Voting · Mathematics of Finance",
     info: "40 items · 40 points · 60 minutes",
-    bank: "exams/math-in-the-modern-world.enc.js",
+    bank: "exams/math-in-the-modern-world.v2.enc.js",
     minutes: 60,
     shuffle: true,
     points: { "Apportionment and Voting": 1, "Mathematics of Finance": 1 },
@@ -74,6 +74,7 @@ const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
+  { v: "2.0", date: "2026-11-03", notes: ["Math in the Modern World: 3 more exam codes (download the exam again)."] },
   { v: "1.9", date: "2026-11-03", notes: ["Abstract Reasoning — Finals: 5 quiz codes (download the quiz again)."] },
   { v: "1.8", date: "2026-11-03", notes: ["Quizzes: after submitting, students see the correct answers with a short explanation."] },
   { v: "1.7", date: "2026-11-03", notes: ["“Check for updates” button on the home page (for iPhone home screen apps)."] },
