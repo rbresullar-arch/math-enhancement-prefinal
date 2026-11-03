@@ -68,6 +68,20 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .subj .m{display:block;font-size:.88rem;color:var(--muted);margin-top:2px}
 .subj .go{font-size:1.6rem;color:var(--pink-dark);opacity:.6}
 .back{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.8);border:1px solid var(--line);color:var(--pink-dark);border-radius:99px;padding:6px 14px;min-height:0;font-size:.9rem;margin-bottom:12px}
+/* admin */
+.brand{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+.ahead{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.ahead .acts{display:flex;gap:8px}.ahead .acts button{min-height:40px;padding:8px 14px;font-size:.9rem}
+.subjhd{font-size:.8rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);margin:22px 0 0}
+.ctab{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:10px}
+.ctab th{text-align:left;color:var(--muted);font-weight:600;padding:4px 6px;border-bottom:1px solid var(--line)}
+.ctab td{padding:8px 6px;border-bottom:1px solid var(--pink-soft);vertical-align:top}
+.ctab .cd{font:700 .95rem ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em;color:var(--pink-dark)}
+.ctab .sm{display:block;font-size:.78rem;color:var(--muted)}
+.mrow{margin-top:8px;font-size:.88rem;color:var(--muted)}.mrow b{font-family:ui-monospace,Menlo,monospace;color:var(--ink)}
+.newc{display:flex;gap:8px;margin-top:12px}.newc input{flex:1;min-width:0;text-transform:uppercase;letter-spacing:.06em;padding:10px 12px}
+.newc button{flex:0 0 auto;min-height:44px;padding:10px 14px}.newc input::placeholder{text-transform:none;letter-spacing:0}
+.amsg{font-size:.88rem;margin-top:6px;min-height:1.2em}.amsg.ok{color:var(--ok)}.amsg.bad{color:var(--bad)}
 /* exam */
 .top{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line)}
 .timer{font-variant-numeric:tabular-nums;font-weight:700}
@@ -118,7 +132,7 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
 
 <!-- 1. NAME -->
 <section id="sName" class="wrap">
-  <h1>Mathematics</h1>
+  <h1 class="brand">Mathematics</h1>
   <p class="sub">Type your name to begin.</p>
   <div class="card">
     <div class="row">
@@ -132,7 +146,7 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
 
 <!-- 2a. SUBJECT -->
 <section id="sSubj" class="wrap hidden">
-  <h1>Mathematics</h1>
+  <h1 class="brand">Mathematics</h1>
   <p class="hello">Hi, <b id="hiName"></b> · <button id="bNotMe" class="link">not you?</button></p>
   <div class="pick">Choose a subject</div>
   <div id="subjList"></div>
@@ -152,6 +166,26 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
   <div id="examList"></div>
   <div class="status"><span class="pill netPill">…</span> <span class="queueMsg"></span> <button class="link bSync hidden">Upload now</button></div>
   <p class="muted dlMsg" style="text-align:center;margin:4px 0 0"></p>
+</section>
+
+<!-- ADMIN -->
+<section id="sAdminLogin" class="wrap hidden">
+  <button id="bAdmBack" class="back">‹ Back</button>
+  <h1>Admin</h1>
+  <p class="sub">Sign in to see and create codes. Needs internet.</p>
+  <div class="card">
+    <label for="fAdmUser">Username</label><input id="fAdmUser" autocomplete="username" autocapitalize="none" spellcheck="false">
+    <label for="fAdmPass">Password</label><input id="fAdmPass" type="password" autocomplete="current-password">
+    <div id="admErr" class="err"></div>
+    <button id="bAdmLogin" class="btn full">Sign in</button>
+  </div>
+</section>
+<section id="sAdmin" class="wrap hidden">
+  <div class="ahead"><button id="bAdmHome" class="back" style="margin:0">‹ Home</button>
+    <div class="acts"><button id="bAdmRefresh" class="btn2">⟳ Refresh</button><button id="bAdmOut" class="btn2">Sign out</button></div></div>
+  <h1 style="margin-top:12px">Codes</h1>
+  <p class="sub" id="admSub">Loading…</p>
+  <div id="admList"></div>
 </section>
 
 <!-- 3. CODE -->
@@ -255,7 +289,7 @@ const ls = {
   set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} },
   del(k){ try{ localStorage.removeItem(k); }catch(e){} }
 };
-const K = { subj:"pf_subj", tab:"pf_tab", name:"pf_name", queue:"pf_queue", active:"pf_active", done:"pf_done", codes:"pf_codes" };
+const K = { xw:"pf_xwraps", subj:"pf_subj", tab:"pf_tab", name:"pf_name", queue:"pf_queue", active:"pf_active", done:"pf_done", codes:"pf_codes" };
 const pad = n => String(n).padStart(2,"0");
 const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const fmtTime = d => { let h=d.getHours(), ap=h<12?"AM":"PM"; h=h%12||12; return `${h}:${pad(d.getMinutes())}:${pad(d.getSeconds())} ${ap}`; };
@@ -268,6 +302,7 @@ const titleCase = v => v.toLowerCase().replace(/(^|[\s\-'])(\p{L})/gu,(m,a,b)=>a
 const nkey = (exam,name) => exam+"|"+name.toLowerCase();
 async function sha(t){ const h=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)); return btoa(String.fromCharCode(...new Uint8Array(h))); }
 const examById = id => EXAMS.find(e => e.id===id);
+const examByKey = k => examById(k) || EXAMS.find(e => e.title.toLowerCase().replace(/\s+/g,"-") === k);   // server keys: exam id (or older title slug)
 const examMin = e => e.minutes || CODE_MINUTES;
 const fmtMin = m => { const h=Math.floor(m/60), r=m%60; return [h?`${h} hour${h>1?"s":""}`:"", r?`${r} minutes`:""].filter(Boolean).join(" "); };
 const perm = n => { const a=[...Array(n).keys()]; for(let i=n-1;i>0;i--){ const j=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; };
@@ -377,8 +412,8 @@ async function pullDone(){
     if(j && j.ok && j.done){
       const done = ls.get(K.done, {}); let changed = false;
       for(const [id, d] of Object.entries(j.done)){
-        if(!examById(id) || done[nkey(id,NAME)]) continue;
-        done[nkey(id,NAME)] = {score:d.score, total:d.total, at:Date.now()}; changed = true;
+        const ex = examByKey(id); if(!ex || done[nkey(ex.id,NAME)]) continue;
+        done[nkey(ex.id,NAME)] = {score:d.score, total:d.total, at:Date.now()}; changed = true;
       }
       if(changed){ ls.set(K.done, done); if(onScreen("sHome")){ pulling = false; return goHome(); } }
     }
@@ -399,6 +434,7 @@ const DL = new Set(); let autoBusy = false;
 async function autoDownload(){
   if(autoBusy || !navigator.onLine || !("caches" in window)) return;
   autoBusy = true;
+  fetchWraps();
   try{
     const need = []; for(const e of EXAMS) if(!(await bankCached(e))) need.push(e);
     if(need.length){
@@ -428,19 +464,32 @@ const noun = e => e && e.kind === "quiz" ? "quiz" : "exam";
 function openCode(e){ EXAM = e; $("codeLabel").textContent = noun(e) === "quiz" ? "Quiz Code" : "Exam Code"; document.querySelectorAll(".nn").forEach(x => x.textContent = noun(e)); document.querySelectorAll(".NN").forEach(x => x.textContent = noun(e) === "quiz" ? "Quiz" : "Exam"); $("codeTitle").textContent = e.title; $("codeTopic").textContent = e.topic; $("fCode").value=""; $("codeErr").textContent="";
   $("codeNote").textContent = `The code works for ${fmtMin(examMin(e))} after it is first used. You can take this ${e.kind === "quiz" ? "quiz" : "exam"} only once.`; show("sCode"); }
 $("bCodeBack").onclick = goHome;
-async function unwrap(bank, code){
+const wrapKey = async (bank, code, use) => {
   const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(code), "PBKDF2", false, ["deriveKey"]);
-  const wk = await crypto.subtle.deriveKey({name:"PBKDF2", salt:b64(bank.salt), iterations:bank.iter, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["decrypt"]);
-  for(const w of bank.wraps){
+  return crypto.subtle.deriveKey({name:"PBKDF2", salt:b64(bank.salt), iterations:bank.iter, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, [use]);
+};
+async function unwrap(bank, code, examId){
+  const wk = await wrapKey(bank, code, "decrypt");
+  const extra = examId ? (ls.get(K.xw, {})[examId] || []) : [];   // codes made in the admin page
+  for(const w of bank.wraps.concat(extra)){
     try{
       const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64(w.iv)}, wk, b64(w.ct));
       const {label, k} = JSON.parse(new TextDecoder().decode(pt));
       const kk = await crypto.subtle.importKey("raw", b64(k), "AES-GCM", false, ["decrypt"]);
       const data = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64(bank.iv)}, kk, b64(bank.ct));
-      return {label, data: JSON.parse(new TextDecoder().decode(data))};
+      return {label, k, data: JSON.parse(new TextDecoder().decode(data))};
     }catch(x){}
   }
   return null;
+}
+async function fetchWraps(){   // unlock data for codes made in the admin page (kept on the phone for offline use)
+  if(!navigator.onLine || !API_URL.startsWith("https://")) return false;
+  try{
+    const ctl = new AbortController(); setTimeout(() => ctl.abort(), 10000);
+    const j = await (await fetch(`${API_URL}?action=wraps`, {signal:ctl.signal})).json();
+    if(j && j.ok && j.wraps){ ls.set(K.xw, j.wraps); return true; }
+  }catch(x){}
+  return false;
 }
 async function serverCheck(code){
   if(!navigator.onLine || !API_URL.startsWith("https://")) return null;
@@ -456,7 +505,8 @@ $("bCode").onclick = async () => {
   b.disabled = true; b.textContent = "Checking…";
   const fail = m => { err.textContent = m; b.disabled = false; b.textContent = "Start"; };
   let bank; try{ bank = await loadBank(EXAM); }catch(x){ return fail(`This ${noun(EXAM)} is not downloaded. Go back and tap Download (needs internet).`); }
-  const u = await unwrap(bank, code);
+  let u = await unwrap(bank, code, EXAM.id);
+  if(!u && await fetchWraps()) u = await unwrap(bank, code, EXAM.id);   // a code just made by the teacher
   if(!u) return fail(`Wrong ${noun(EXAM)} code. Ask your teacher.`);
   const master = u.label === "Master";
   const done = ls.get(K.done, {});
@@ -605,7 +655,7 @@ function renderReview(rv){
 let scoreCache = null;
 function record(status){
   const t1 = new Date(att.started), t2 = att.ended ? new Date(att.ended) : null, s = scoreCache || {};
-  return { kind:"result", id:att.id, status, exam:att.examTitle, name:att.name, set:att.setName, code:att.code,
+  return { kind:"result", id:att.id, status, exam:att.examTitle, examId:att.exam, name:att.name, set:att.setName, code:att.code,
     online:att.online ? "Yes" : "No (offline)", date:fmtDate(t1), timeStarted:fmtTime(t1), timeEnded:t2?fmtTime(t2):"",
     duration:t2?`${Math.floor((t2-t1)/60000)} min ${Math.round((t2-t1)/1000)%60} sec`:"",
     score:s.score ?? "", total:s.total ?? "", percent:s.percent ?? "",
@@ -685,7 +735,7 @@ async function confirmFromServer(){   // remove queued records the Sheet already
       const ctl = new AbortController(); setTimeout(() => ctl.abort(), 10000);
       const j = await (await fetch(`${API_URL}?action=status&name=${encodeURIComponent(name)}`, {signal:ctl.signal})).json();
       if(!(j && j.ok && j.done)) continue;
-      const titles = new Set(Object.keys(j.done).map(id => (examById(id) || {}).title).filter(Boolean));
+      const titles = new Set(Object.keys(j.done).map(id => (examByKey(id) || {}).title).filter(Boolean));
       const keys = new Set(ls.get(K.queue,[]).filter(r => r.kind === "result" && r.name === name && titles.has(r.exam)).map(rkey));
       if(keys.size) dropSent(keys);
     }catch(x){}
@@ -762,6 +812,99 @@ function drawCoach(){
   });
 }
 addEventListener("resize", drawCoach);
+
+/* ---------- admin (sign-in and codes are checked by the Apps Script, never stored in this page) ---------- */
+const ADM = "pf_admin";
+const admTok = () => { try{ return sessionStorage.getItem(ADM) || ""; }catch(x){ return ""; } };
+const admSet = t => { try{ t ? sessionStorage.setItem(ADM, t) : sessionStorage.removeItem(ADM); }catch(x){} };
+let admBack = "sName", ADMDATA = null;
+async function admCall(op, extra){
+  if(!navigator.onLine) return {ok:false, reason:"offline"};
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 30000);
+  try{
+    const res = await fetch(API_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(Object.assign({action:"admin", op, token:admTok()}, extra || {})), signal:ctl.signal});
+    return await res.json();
+  }catch(x){ return {ok:false, reason:"network"}; } finally{ clearTimeout(t); }
+}
+$all(".brand").forEach(h => h.onclick = () => { admBack = onScreen("sSubj") ? "sSubj" : "sName"; admTok() ? adminHome() : (show("sAdminLogin"), $("admErr").textContent = "", $("fAdmPass").value = "", $("fAdmUser").focus()); });
+$("bAdmBack").onclick = () => show(admBack);
+$("fAdmPass").addEventListener("keydown", e => { if(e.key === "Enter") $("bAdmLogin").click(); });
+$("bAdmLogin").onclick = async () => {
+  const b = $("bAdmLogin"), err = $("admErr"); err.textContent = "";
+  if(!navigator.onLine){ err.textContent = "No internet. Admin needs a connection."; return; }
+  b.disabled = true; b.textContent = "Signing in…";
+  const j = await admCall("login", {user:$("fAdmUser").value.trim(), pass:$("fAdmPass").value});
+  b.disabled = false; b.textContent = "Sign in"; $("fAdmPass").value = "";
+  if(j.ok && j.token){ admSet(j.token); adminHome(); return; }
+  err.textContent = j.reason === "locked" ? "Too many wrong tries. Wait 15 minutes." : j.reason === "wrong" ? "Wrong username or password." : "Could not reach the server. Try again.";
+};
+$("bAdmHome").onclick = () => show(admBack === "sSubj" ? "sSubj" : (NAME ? (goSubjects(), "sSubj") : "sName"));
+$("bAdmRefresh").onclick = () => adminHome();
+$("bAdmOut").onclick = async () => { admCall("logout"); admSet(""); show(admBack); };
+const STPILL = {Unused:"", Active:"ok", Expired:"bad"};
+async function adminHome(){
+  show("sAdmin"); $("admSub").textContent = "Loading…"; $("admList").innerHTML = "";
+  const j = await admCall("list");
+  if(!j.ok){
+    if(j.reason === "session"){ admSet(""); show("sAdminLogin"); $("admErr").textContent = "Session ended. Sign in again."; return; }
+    $("admSub").textContent = j.reason === "offline" ? "No internet. Connect, then tap Refresh." : "Could not load codes. Tap Refresh."; return;
+  }
+  ADMDATA = j;
+  $("admSub").textContent = `${j.codes.length} codes · tap Create to add one`;
+  const box = $("admList");
+  for(const sb of SUBJECTS){
+    const exams = EXAMS.filter(e => subjOf(e) === sb.id); if(!exams.length) continue;
+    const hd = document.createElement("div"); hd.className = "subjhd"; hd.textContent = sb.title; box.appendChild(hd);
+    for(const e of exams){
+      const list = j.codes.filter(c => c.exam === e.id), m = (j.masters || {})[e.id];
+      const el = document.createElement("div"); el.className = "card";
+      el.innerHTML = `<div class="bar"><h2 style="margin:0">${esc(e.title)}</h2><span class="pill">${kindOf(e) === "quiz" ? "Quiz" : "Exam"} · ${fmtMin(examMin(e))}</span></div>
+        ${m ? `<div class="mrow">Master (no limit): <b>${esc(m)}</b></div>` : ""}
+        ${list.length ? `<table class="ctab"><tr><th>Code</th><th>Status</th><th>Used</th></tr>${list.map(c => `<tr>
+          <td><span class="cd">${esc(c.code)}</span><span class="sm">${esc(c.label)}</span></td>
+          <td><span class="pill ${STPILL[c.status] || ""}">${esc(c.status)}</span>${c.expires ? `<span class="sm">until ${esc(c.expires)}</span>` : ""}</td>
+          <td>${c.used}${c.lastBy ? `<span class="sm">${esc(c.lastBy)}</span>` : ""}</td></tr>`).join("")}</table>` : `<p class="muted">No codes yet.</p>`}
+        <div class="newc"><input placeholder="New code (blank = auto)" maxlength="16" autocapitalize="characters" spellcheck="false"><button class="btn">Create</button></div>
+        <div class="amsg"></div>`;
+      const inp = el.querySelector("input"), btn = el.querySelector("button"), msg = el.querySelector(".amsg");
+      btn.onclick = () => createCode(e, inp, btn, msg);
+      box.appendChild(el);
+    }
+  }
+}
+const CODE_ABC = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+const randCode = () => Array.from(crypto.getRandomValues(new Uint32Array(6)), x => CODE_ABC[x % CODE_ABC.length]).join("");
+async function createCode(e, inp, btn, msg){
+  const say = (t, ok) => { msg.textContent = t; msg.className = "amsg " + (ok ? "ok" : "bad"); };
+  let code = inp.value.trim().toUpperCase().replace(/\s+/g, "");
+  if(!code) code = randCode();
+  if(!/^[A-Z0-9-]{4,16}$/.test(code)) return say("Use 4–16 letters, numbers or dashes.");
+  const list = ADMDATA.codes.filter(c => c.exam === e.id), m = (ADMDATA.masters || {})[e.id];
+  if(list.some(c => c.code === code) || code === m) return say("That code already exists.");
+  btn.disabled = true; btn.textContent = "Creating…"; msg.textContent = "";
+  try{
+    if(!(await bankCached(e))) await download(e, true);
+    const bank = await loadBank(e);
+    let key = null;   // unlock the exam with a code it already has, then add the new code
+    for(const c of [m, ...list.filter(c => !c.added).map(c => c.code), ...list.map(c => c.code)].filter(Boolean)){
+      const u = await unwrap(bank, c, e.id); if(u){ key = u.k; break; }
+    }
+    if(!key) throw "Could not open this exam file with its existing codes.";
+    let n = 1; while(list.some(c => c.label === "Code " + n)) n++;
+    const label = "Code " + n, iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = await crypto.subtle.encrypt({name:"AES-GCM", iv}, await wrapKey(bank, code, "encrypt"), new TextEncoder().encode(JSON.stringify({label, k:key})));
+    const enc = u8 => btoa(String.fromCharCode(...new Uint8Array(u8)));
+    const j = await admCall("add", {exam:e.id, code, label, wrap:{iv:enc(iv), ct:enc(ct)}});
+    if(!j.ok) throw j.reason === "duplicate" ? "That code already exists." : j.reason === "session" ? "Session ended. Sign in again." : "Server did not save the code. Try again.";
+    await fetchWraps();
+    await adminHome();
+    say(`Created ${j.code} (${j.label}).`, true);
+    const card = [...$all("#admList .card")].find(x => x.querySelector("h2").textContent === e.title);
+    if(card){ const mm = card.querySelector(".amsg"); mm.textContent = `Created ${j.code} (${j.label}). Students' phones pick it up when online.`; mm.className = "amsg ok"; }
+  }catch(x){ say(typeof x === "string" ? x : "Something went wrong. Try again."); }
+  btn.disabled = false; btn.textContent = "Create";
+}
 
 /* ---------- install / offline shell ---------- */
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
