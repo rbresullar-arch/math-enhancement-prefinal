@@ -121,7 +121,7 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
   <h1 id="codeTitle"></h1>
   <p class="sub" id="codeTopic"></p>
   <div class="card">
-    <label for="fCode">Exam Code</label>
+    <label for="fCode">Quiz Code</label>
     <input id="fCode" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Given by your teacher" style="text-transform:uppercase;letter-spacing:.08em">
     <p class="muted" id="codeNote"></p>
     <div id="codeErr" class="err"></div>
@@ -333,12 +333,12 @@ async function serverCheck(code){
 }
 $("bCode").onclick = async () => {
   const code = $("fCode").value.trim().toUpperCase().replace(/\s+/g,""), err = $("codeErr"), b = $("bCode");
-  err.textContent = ""; if(!code){ err.textContent = "Please type the exam code."; return; }
+  err.textContent = ""; if(!code){ err.textContent = "Please type the quiz code."; return; }
   b.disabled = true; b.textContent = "Checking…";
   const fail = m => { err.textContent = m; b.disabled = false; b.textContent = "Start"; };
   let bank; try{ bank = await loadBank(EXAM); }catch(x){ return fail("This exam is not downloaded. Go back and tap Download (needs internet)."); }
   const u = await unwrap(bank, code);
-  if(!u) return fail("Wrong exam code. Ask your teacher.");
+  if(!u) return fail("Wrong quiz code. Ask your teacher.");
   const master = u.label === "Master";
   const done = ls.get(K.done, {});
   if(done[nkey(EXAM.id,NAME)] && !master) return fail("You already took this exam.");
