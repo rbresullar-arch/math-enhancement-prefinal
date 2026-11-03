@@ -11,6 +11,6 @@
 - One attempt per student. Results go to Google Sheets (queued on the phone when offline).
 - Flags (leaving the app, copy/paste, etc.) are logged only.
 
-**Adding an exam:** add an entry to `EXAMS` in `config.js` and its encrypted bank in `/exams`.
+**Adding an exam or quiz:** add an entry to `EXAMS` in `config.js` and its encrypted bank in `/exams`. Quizzes need `kind: "quiz"` (listed under Quizzes); others are listed under Examinations. Add a line to `VERSIONS` in `config.js` for each update.
 Optional fields: `minutes` (time limit), `shuffle: true` (per-student question + choice order), `rules` (shown before the exam).
 Codes not listed in the Apps Script `CODES` are accepted by the bank and timed on the device.
