@@ -55,7 +55,7 @@ const EXAMS = [
     title: "Abstract Reasoning — Finals",
     topic: "Series · Analogy · Odd One Out · Matrix · Mirror and Rotation",
     info: "30 items · 30 points · 60 minutes",
-    bank: "exams/abstract-reasoning-finals.v3.enc.js",
+    bank: "exams/abstract-reasoning-finals.v4.enc.js",
     minutes: 60,
     shuffle: true,
     points: { "Series": 1, "Analogy": 1, "Odd One Out": 1, "Matrix": 1, "Mirror and Rotation": 1 },
@@ -74,6 +74,7 @@ const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
+  { v: "1.9", date: "2026-11-03", notes: ["Abstract Reasoning — Finals: 5 quiz codes (download the quiz again)."] },
   { v: "1.8", date: "2026-11-03", notes: ["Quizzes: after submitting, students see the correct answers with a short explanation."] },
   { v: "1.7", date: "2026-11-03", notes: ["“Check for updates” button on the home page (for iPhone home screen apps)."] },
   { v: "1.6", date: "2026-11-03", notes: ["App updates now load right away (no stale copy after an update)."] },
