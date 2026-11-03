@@ -1,5 +1,5 @@
 // Offline support. App files: network-first (always fresh when online). Exam banks: kept once downloaded.
-const SHELL = "pf-shell-v1";
+const SHELL = "pf-shell-v2";
 const FILES = ["./", "index.html", "config.js", "manifest.json", "icon-180.png", "icon-192.png", "icon-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(SHELL).then(c => c.addAll(FILES))); self.skipWaiting(); });
 self.addEventListener("activate", e => {
@@ -15,8 +15,8 @@ self.addEventListener("fetch", e => {
       if (res.ok) { const c = res.clone(); caches.open("pf-exams").then(x => x.put(req, c)); } return res; })));
     return;
   }
-  e.respondWith(   // app files: network first, fall back to saved copy
-    fetch(req).then(res => { if (res.ok) { const c = res.clone(); caches.open(SHELL).then(x => x.put(req, c)); } return res; })
+  e.respondWith(   // app files: network first (skip the browser cache so updates show at once), fall back to saved copy
+    fetch(new Request(req.url, {cache:"no-cache", credentials:"same-origin"})).then(res => { if (res.ok) { const c = res.clone(); caches.open(SHELL).then(x => x.put(req, c)); } return res; })
       .catch(() => caches.match(req, {ignoreSearch:true}).then(r => r || caches.match("index.html")))
   );
 });

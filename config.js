@@ -74,6 +74,7 @@ const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
+  { v: "1.6", date: "2026-11-03", notes: ["App updates now load right away (no stale copy after an update)."] },
   { v: "1.5", date: "2026-11-03", notes: ["Screens and messages say “quiz” or “exam” to match what is being taken.", "Abstract Reasoning item 9: clearer answer choices (download the quiz again)."] },
   { v: "1.4", date: "2026-11-03", notes: ["Separate Examinations and Quizzes buttons on the home page.", "Version history added."] },
   { v: "1.3", date: "2026-11-03", notes: ["Abstract Reasoning — Finals quiz (30 picture items).", "Questions and choices can now show figures.", "Code prompt reads “Quiz Code” for quizzes, “Exam Code” for examinations."] },

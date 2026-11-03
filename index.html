@@ -613,7 +613,15 @@ addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = 
 $("bInstall").onclick = async () => { if(!installEvt) return; installEvt.prompt(); await installEvt.userChoice; installEvt=null; $("bInstall").classList.add("hidden"); };
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
 if(isIOS && !(navigator.standalone || matchMedia("(display-mode: standalone)").matches)) $("iosTip").classList.remove("hidden");
-if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+if("serviceWorker" in navigator){
+  const hadSW = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register("sw.js").then(r => r.update()).catch(()=>{});
+  // a newer app version took over: reload once, but never in the middle of an exam or quiz
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if(!hadSW || sessionStorage.getItem("pf_reloaded")) return;
+    if(!$("sName").classList.contains("hidden") || !$("sHome").classList.contains("hidden")){ sessionStorage.setItem("pf_reloaded","1"); location.reload(); }
+  });
+}
 
 /* ---------- boot ---------- */
 (function boot(){
