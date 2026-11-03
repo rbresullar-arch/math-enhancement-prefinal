@@ -3,6 +3,7 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbyiqxFMAFSW4ni5WNmBnz2YpBIqmfMRLOOLfw-DAWEVodnELaIT_KLiQqoAdtw-_82FTg/exec";
 
 // Exams shown on the home page. To add an exam: add an entry + its encrypted bank file in /exams.
+// kind: "exam" (default) is listed under Examinations, "quiz" under Quizzes.
 const EXAMS = [
   {
     id: "math-enhancement",
@@ -50,6 +51,7 @@ const EXAMS = [
   },
   {
     id: "abstract-reasoning-finals",
+    kind: "quiz",
     title: "Abstract Reasoning — Finals",
     topic: "Series · Analogy · Odd One Out · Matrix · Mirror and Rotation",
     info: "30 items · 30 points · 60 minutes",
@@ -69,3 +71,12 @@ const EXAMS = [
 
 // Minutes a session code stays valid after its first use
 const CODE_MINUTES = 90;
+
+// Version history shown at the bottom of the home page (newest first)
+const VERSIONS = [
+  { v: "1.4", date: "2026-11-03", notes: ["Separate Examinations and Quizzes buttons on the home page.", "Version history added."] },
+  { v: "1.3", date: "2026-11-03", notes: ["Abstract Reasoning — Finals quiz (30 picture items).", "Questions and choices can now show figures.", "Code prompt renamed to “Quiz Code”."] },
+  { v: "1.2", date: "2026-10-23", notes: ["Math in the Modern World — Prelim exam added."] },
+  { v: "1.1", date: "2026-10-12", notes: ["Math in the Modern World exam added (shuffled questions and choices).", "Scores submitted on other devices now show on the home page."] },
+  { v: "1.0", date: "2026-10-12", notes: ["First release: name entry, offline download and install, session codes, flag logging.", "Math Enhancement exam."] }
+];

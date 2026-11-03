@@ -48,6 +48,11 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .exam .actions{display:flex;gap:10px;margin-top:14px}
 .exam .actions button{flex:1}
 .status{font-size:.9rem;color:var(--muted);text-align:center;margin-top:18px}
+.tabs{display:flex;gap:10px;margin:4px 0 6px}.tabs button{flex:1;white-space:nowrap;padding:12px 6px;font-size:.95rem;background:#fff;border:2px solid var(--line);color:var(--pink-dark)}
+.tabs button.on{background:var(--pink);border-color:var(--pink);color:#fff}.tabs .n{opacity:.8;font-weight:500}
+.empty{text-align:center;color:var(--muted)}
+.ver{margin-top:22px;font-size:.88rem;color:var(--muted)}.ver summary{cursor:pointer;text-align:center;font-weight:600}
+.ver h3{font-size:.92rem;margin:12px 0 2px;color:var(--ink)}.ver ul{margin:2px 0;padding-left:20px}
 /* exam */
 .top{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line)}
 .timer{font-variant-numeric:tabular-nums;font-weight:700}
@@ -110,10 +115,12 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
 <section id="sHome" class="wrap hidden">
   <h1>PREFINAL EXAMINATION</h1>
   <p class="sub">Hi, <b id="hiName"></b> · <button id="bNotMe" class="link">not you?</button></p>
+  <div class="tabs"><button id="tExam" data-k="exam">Examinations</button><button id="tQuiz" data-k="quiz">Quizzes</button></div>
   <div id="examList"></div>
   <div class="card hidden" id="iosTip"><p class="muted">📱 <b>iPhone/iPad:</b> tap <b>Share</b> then <b>Add to Home Screen</b>, and open the exam from the new icon. This keeps it saved for offline use.</p></div>
   <button id="bInstall" class="btn2 full hidden">Install app on this device</button>
   <div class="status"><span id="netPill" class="pill">…</span> <span id="queueMsg"></span> <button id="bSync" class="link hidden">Upload now</button></div>
+  <details class="ver card"><summary id="verSum"></summary><div id="verList"></div></details>
 </section>
 
 <!-- 3. CODE -->
@@ -215,7 +222,7 @@ const ls = {
   set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} },
   del(k){ try{ localStorage.removeItem(k); }catch(e){} }
 };
-const K = { name:"pf_name", queue:"pf_queue", active:"pf_active", done:"pf_done", codes:"pf_codes" };
+const K = { tab:"pf_tab", name:"pf_name", queue:"pf_queue", active:"pf_active", done:"pf_done", codes:"pf_codes" };
 const pad = n => String(n).padStart(2,"0");
 const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const fmtTime = d => { let h=d.getHours(), ap=h<12?"AM":"PM"; h=h%12||12; return `${h}:${pad(d.getMinutes())}:${pad(d.getSeconds())} ${ap}`; };
@@ -251,7 +258,17 @@ async function goHome(){
   $("hiName").textContent = NAME;
   const done = ls.get(K.done, {});
   const box = $("examList"); box.innerHTML = "";
-  for(const e of EXAMS){
+  const kindOf = e => e.kind === "quiz" ? "quiz" : "exam";
+  let tab = ls.get(K.tab, "exam"); if(tab !== "quiz") tab = "exam";
+  for(const b of [$("tExam"), $("tQuiz")]){
+    const k = b.dataset.k, n = EXAMS.filter(e => kindOf(e) === k).length;
+    b.innerHTML = `${k === "quiz" ? "Quizzes" : "Examinations"} <span class="n">(${n})</span>`;
+    b.classList.toggle("on", k === tab);
+    b.onclick = () => { ls.set(K.tab, k); goHome(); };
+  }
+  const list = EXAMS.filter(e => kindOf(e) === tab);
+  if(!list.length) box.innerHTML = `<div class="card empty">No ${tab === "quiz" ? "quizzes" : "examinations"} yet.</div>`;
+  for(const e of list){
     const d = done[nkey(e.id,NAME)], have = await bankCached(e);
     const el = document.createElement("div"); el.className = "card exam";
     const pill = d ? `<span class="pill ok">Submitted ✓</span>` : have ? `<span class="pill ok">Available offline ✓</span>` : `<span class="pill warn">Not downloaded</span>`;
@@ -259,7 +276,7 @@ async function goHome(){
       <p class="muted">${esc(e.topic)} · ${esc(e.info)}</p>
       ${d ? `<p>Your score: <b>${d.score} / ${d.total}</b></p>` : `<div class="actions">
         ${have ? "" : `<button class="btn2" data-dl>Download</button>`}
-        <button class="btn" data-go>Take exam</button></div>`}`;
+        <button class="btn" data-go>Take ${kindOf(e)}</button></div>`}`;
     const dl = el.querySelector("[data-dl]"), go = el.querySelector("[data-go]");
     if(dl) dl.onclick = async () => { dl.disabled=true; dl.textContent="Downloading…"; const ok = await download(e); if(!ok){ dl.disabled=false; dl.textContent="Try again"; } else goHome(); };
     if(go) go.onclick = () => openCode(e);
@@ -268,6 +285,13 @@ async function goHome(){
   refreshStatus(); show("sHome");
   pullDone();
 }
+/* version history */
+(function(){
+  if(typeof VERSIONS === "undefined" || !VERSIONS.length) return;
+  const fd = d => new Date(d + "T00:00:00").toLocaleDateString(undefined, {year:"numeric", month:"short", day:"numeric"});
+  $("verSum").textContent = `Version ${VERSIONS[0].v} · ${fd(VERSIONS[0].date)} · history`;
+  $("verList").innerHTML = VERSIONS.map(x => `<h3>v${esc(x.v)} — ${esc(fd(x.date))}</h3><ul>${x.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul>`).join("");
+})();
 /* scores submitted on other devices (same name) */
 let pulling = false;
 async function pullDone(){
@@ -307,7 +331,7 @@ function loadBank(e){
 
 /* ---------- 3. code ---------- */
 function openCode(e){ EXAM = e; $("codeTitle").textContent = e.title; $("codeTopic").textContent = e.topic; $("fCode").value=""; $("codeErr").textContent="";
-  $("codeNote").textContent = `The code works for ${fmtMin(examMin(e))} after it is first used. You can take this exam only once.`; show("sCode"); }
+  $("codeNote").textContent = `The code works for ${fmtMin(examMin(e))} after it is first used. You can take this ${e.kind === "quiz" ? "quiz" : "exam"} only once.`; show("sCode"); }
 $("bCodeBack").onclick = goHome;
 async function unwrap(bank, code){
   const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(code), "PBKDF2", false, ["deriveKey"]);
