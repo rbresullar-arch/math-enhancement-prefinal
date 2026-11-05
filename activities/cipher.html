@@ -80,8 +80,7 @@ code.cw.sm{display:inline;font-size:1rem;padding:2px 8px;border-radius:8px;lette
   <div class="card">
     <div id="hiBox" class="hidden"><p>Hi, <b id="hiName"></b></p></div>
     <div id="nameBox"><label for="pname">Full name (Last Name, First Name)</label><input id="pname" autocomplete="off"></div>
-    <label for="pset">Message set (given by your teacher)</label>
-    <select id="pset"><option value="1">Set 1</option><option value="2">Set 2</option><option value="3">Set 3</option><option value="4">Set 4</option><option value="5">Set 5</option></select>
+    <p class="muted">Your message set and shift are assigned randomly.</p>
     <div id="serr" class="err"></div>
     <button class="btn full" id="go">Start</button>
   </div>
@@ -169,7 +168,7 @@ code.cw.sm{display:inline;font-size:1rem;padding:2px 8px;border-radius:8px;lette
   function begin(){
     var name = SITE_NAME || $("pname").value.trim().replace(/\s+/g," ");
     if (name.length < 3){ $("serr").textContent = "Please type your full name."; return; }
-    var set = $("pset").value;
+    var set = String(1 + Math.floor(mulberry32(hashStr(name.toUpperCase() + "|set"))() * 5));
     S.name = name; S.set = set; S.filled = false;
     S.plainFull = atob(DATA[set].m);
     S.plain = S.plainFull.toUpperCase().replace(/[^A-Z]/g,"");
