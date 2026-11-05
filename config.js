@@ -79,11 +79,24 @@ const EXAMS = [
   }
 ];
 
+// Activities: open directly (no code, no upload). Listed under the Activities tab of their subject.
+const ACTIVITIES = [
+  {
+    id: "mmw-cipher",
+    subject: "mmw",
+    title: "Cipher Decoder",
+    topic: "Coding Theory and Cryptography · Caesar cipher",
+    info: "Decode a clue word, then a hidden message · works offline",
+    url: "activities/cipher.html"
+  }
+];
+
 // Minutes a session code stays valid after its first use
 const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
+  { v: "2.4", date: "2026-11-05", notes: ["New Activities tab. Math in the Modern World: Cipher Decoder (Caesar cipher)."] },
   { v: "2.3", date: "2026-11-04", notes: ["Admin: tap “Mathematics” to sign in, see all codes and create new ones.", "Fixed: uploads were saved to the Sheet but the phone kept showing them as waiting.", "Scores for the Prelim and Abstract Reasoning now show on other devices."] },
   { v: "2.2", date: "2026-11-04", notes: ["Simpler footer: version number with a refresh button to check for updates."] },
   { v: "2.1", date: "2026-11-04", notes: ["Renamed to Mathematics. Choose a subject first: Math Enhancement or Math in the Modern World.", "New pastel pink look and home screen icon.", "Exams and quizzes download by themselves whenever the phone is online.", "Fixed: “waiting to upload” no longer stays after results already reached the Google Sheet."] },

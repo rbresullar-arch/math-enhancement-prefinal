@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cipher Decoder · Mathematics</title>
+<meta name="theme-color" content="#fde7f1">
+<link rel="manifest" href="../manifest.json">
+<link rel="icon" href="../icon-192-v2.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../icon-180-v2.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+:root{
+  --pink:#ee7fb0; --pink-dark:#9c2a63; --pink-soft:#fde9f2; --line:#f7d6e5;
+  --bg:#fff8fb; --ink:#3a1f2d; --muted:#8a6777;
+  --btn:#f6b1cf; --btn2:#f19bc1; --btn-ink:#4a1033; --shadow:0 10px 28px -16px rgba(196,62,128,.45);
+  --ok:#1f8a4c; --ok-soft:#e3f6ea; --bad:#c0392b;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg) linear-gradient(180deg,#ffe6f1 0,var(--bg) 260px) no-repeat;color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.wrap{max-width:640px;margin:0 auto;padding:20px 16px 32px}
+h1{font-size:1.7rem;font-weight:800;letter-spacing:-.01em;margin:0;color:var(--pink-dark)}
+h2{font-size:1.15rem;margin:0 0 .5em;color:var(--pink-dark)}
+p{margin:.4em 0}
+.sub{color:var(--muted);margin:2px 0 18px}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;margin:12px 0;box-shadow:var(--shadow)}
+.muted{color:var(--muted);font-size:.92rem}
+label{display:block;font-weight:600;margin:12px 0 4px}
+input,select{width:100%;font:inherit;padding:12px 14px;border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--ink)}
+input:focus,select:focus{outline:none;border-color:var(--pink)}
+button{font:inherit;font-weight:700;border:0;border-radius:14px;padding:12px 18px;cursor:pointer;min-height:48px}
+.btn{background:linear-gradient(135deg,var(--btn),var(--btn2));color:var(--btn-ink);box-shadow:0 8px 18px -10px rgba(214,51,132,.7)}
+.btn:active{filter:brightness(.95);transform:translateY(1px)}
+.btn2{background:#fff;color:var(--pink-dark);border:2px solid var(--line)}
+.btn2:active{background:var(--pink-soft)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.full{width:100%}
+.hidden{display:none!important}
+.err{color:var(--bad);font-weight:600;min-height:1.4em;margin-top:8px}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;background:var(--pink-soft);color:var(--pink-dark);font-weight:600;font-size:.82rem;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.back{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.8);border:1px solid var(--line);color:var(--pink-dark);border-radius:99px;padding:6px 14px;min-height:0;font-size:.9rem;margin-bottom:12px;text-decoration:none;font-weight:700}
+.step{font-size:.8rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);margin:0 0 4px}
+/* top bar */
+.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.top .nm{font-weight:700;color:var(--pink-dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.timer{font-variant-numeric:tabular-nums;font-weight:700}
+/* clue */
+code.cw{display:block;font:700 1.5rem/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.18em;color:var(--pink-dark);background:var(--pink-soft);border-radius:14px;padding:12px;text-align:center;word-break:break-all;margin:6px 0 10px}
+code.cw.sm{display:inline;font-size:1rem;padding:2px 8px;border-radius:8px;letter-spacing:.1em}
+.def{font-size:1.02rem}
+.crow{display:flex;gap:8px;margin-top:12px}.crow input{flex:1;min-width:0;text-transform:uppercase;letter-spacing:.08em}.crow button{flex:0 0 auto}
+.crow input::placeholder{text-transform:none;letter-spacing:0}
+.res{font-weight:600;min-height:1.4em;margin-top:8px}.res.ok{color:var(--ok)}.res.bad{color:var(--bad)}
+.hint{background:var(--pink-soft);border-radius:14px;padding:10px 12px;margin-top:10px}
+/* message */
+#cipher{font:600 1.08rem/1.75 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;word-break:break-all;color:var(--ink)}
+#cipher .s{color:var(--pink-dark);background:var(--pink-soft);border-radius:4px;font-weight:800}
+.swap{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end;margin-top:14px}
+.swap label{font-size:.85rem;margin:0 0 4px}
+.swap input{text-align:center;font:800 1.6rem ui-monospace,Menlo,monospace;text-transform:uppercase;padding:8px}
+.swap .arr{font-size:1.5rem;color:var(--pink);padding-bottom:10px}
+.acts{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin-top:10px}
+#msg{color:var(--bad);font-weight:600;min-height:1.3em;margin-top:8px;font-size:.92rem}
+/* solved */
+.solved{text-align:center;background:linear-gradient(135deg,#ffe1ee,#fbc9de);border:0}
+.solved .big{font-size:1.5rem;font-weight:800;color:var(--pink-dark)}
+.solved .code{display:inline-block;margin-top:8px;font:800 1.3rem ui-monospace,Menlo,monospace;letter-spacing:.06em;background:#fff;border-radius:14px;padding:8px 14px;color:var(--pink-dark)}
+#plain{text-align:left;margin-top:12px;background:rgba(255,255,255,.75);border-radius:14px;padding:12px}
+</style>
+</head>
+<body>
+
+<!-- START -->
+<section id="start" class="wrap">
+  <a class="back" href="../">‹ Mathematics</a>
+  <h1>Cipher Decoder</h1>
+  <p class="sub">Math in the Modern World · Cryptography (Caesar cipher)</p>
+  <div class="card">
+    <div id="hiBox" class="hidden"><p>Hi, <b id="hiName"></b></p></div>
+    <div id="nameBox"><label for="pname">Full name (Last Name, First Name)</label><input id="pname" autocomplete="off"></div>
+    <label for="pset">Message set (given by your teacher)</label>
+    <select id="pset"><option value="1">Set 1</option><option value="2">Set 2</option><option value="3">Set 3</option><option value="4">Set 4</option><option value="5">Set 5</option></select>
+    <div id="serr" class="err"></div>
+    <button class="btn full" id="go">Start</button>
+  </div>
+  <div class="card">
+    <h2>How it works</h2>
+    <p class="muted">1. Decode the clue word — a term from this course — using its definition.</p>
+    <p class="muted">2. Use the clue to find the shift, then decode the whole message letter by letter.</p>
+    <p class="muted">3. Show your completion code to your teacher.</p>
+    <p class="muted">Every student gets a different shift. Your progress is saved on this phone.</p>
+  </div>
+</section>
+
+<!-- GAME -->
+<section id="game" class="wrap hidden">
+  <a class="back" href="../">‹ Mathematics</a>
+  <div class="top"><span class="nm" id="who"></span><span><span class="pill" id="whoSet"></span> <span class="timer" id="timer">00:00</span></span></div>
+
+  <div id="phase1">
+    <div class="card">
+      <div class="step">Step 1 of 2</div>
+      <h2>Decode the clue word</h2>
+      <p class="muted">This encrypted word is a term from Math in the Modern World. It uses the same shift as your message. Read the definition, type the word, and tap Check.</p>
+      <div id="clues"></div>
+      <div id="hint" class="hint muted hidden"><b>Hint:</b> compare a cipher letter with its real letter. Every letter moves the same number of places in the alphabet.</div>
+    </div>
+  </div>
+
+  <div id="phase2" class="hidden">
+    <div id="solved" class="card solved hidden">
+      <div class="big">Solved! 🎉</div>
+      <div id="stime"></div>
+      <div class="code" id="scode"></div>
+      <p class="muted">Show this completion code to your teacher.</p>
+      <div id="plain"></div>
+    </div>
+    <div class="card">
+      <div class="step">Step 2 of 2</div>
+      <h2>Decode the message</h2>
+      <p class="muted">Use your clue word to find the shift, then assign each letter yourself. Pink lowercase letters are your answers.</p>
+      <div id="cipher"></div>
+      <div class="swap">
+        <div><label for="cin">Cipher letter</label><input id="cin" maxlength="1" autocapitalize="characters" autocomplete="off"></div>
+        <div class="arr">→</div>
+        <div><label for="pin">Replace with</label><input id="pin" maxlength="1" autocapitalize="characters" autocomplete="off"></div>
+      </div>
+      <div class="acts"><button class="btn" id="apply">Apply</button><button class="btn2" id="undo">Undo</button><button class="btn2" id="reset">Reset</button></div>
+      <div id="msg"></div>
+      <p class="muted">Leave “Replace with” blank to remove a letter.</p>
+    </div>
+    <div class="card">
+      <h2>Your clue word</h2>
+      <div id="clues2"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  // Messages are base64-encoded to discourage casual source viewing.
+  var DATA = {
+    1: { m: "RXZlcnkgZ3JlYXQgam91cm5leSBiZWdpbnMgd2l0aCBhIHNpbmdsZSBicmF2ZSBzdGVwLiBEbyBub3QgZmVhciBtaXN0YWtlcyBiZWNhdXNlIHRoZXkgcXVpZXRseSBzaGFwZSB5b3VyIHdpc2RvbS4gSGFyZCB3b3JrIGJlYXRzIHRhbGVudCB3aGVuIHRhbGVudCByZWZ1c2VzIHRvIHdvcmsuIEtlZXAgeW91ciBmb2N1cyBvbiBnb2Fscywgbm90IG9uIG9ic3RhY2xlcy4gU21hbGwgZGFpbHkgZWZmb3J0IGJ1aWxkcyBhIHN0cm9uZyBhbmQgbGFzdGluZyBmdXR1cmUuIEJlbGlldmUgaW4geW91cnNlbGYgZXZlbiB3aGVuIG90aGVycyBkb3VidCB5b3UuIFlvdXIgZHJlYW1zIGFyZSB2YWxpZCBhbmQgd29ydGggZXZlcnkgc2FjcmlmaWNlLiBGYWlsdXJlIGlzIG9ubHkgYSBsZXNzb24gd2FpdGluZyB0byBiZSBsZWFybmVkLiBTdGF5IGN1cmlvdXMsIHN0YXkgaHVtYmxlLCBhbmQgbmV2ZXIgc3RvcCBhc2tpbmcgcXVlc3Rpb25zLiBUb2RheSBpcyB0aGUgcGVyZmVjdCBkYXkgdG8gZXhjZWwgYW5kIGFtYXplIHlvdXJzZWxmLg==" },
+    2: { m: "U3VjY2VzcyBpcyBidWlsdCBvbiBwYXRpZW5jZSBhbmQgc3RlYWR5IHByYWN0aWNlLiBFdmVyeSBleHBlcnQgd2FzIG9uY2UgYSBiZWdpbm5lciB3aG8gcmVmdXNlZCB0byBxdWl0LiBNaXN0YWtlcyBhcmUgcHJvb2YgdGhhdCB5b3UgYXJlIHRyeWluZy4gTmV2ZXIgbGV0IG9uZSBiYWQgZ3JhZGUgZGVmaW5lIHlvdXIgd29ydGguIFlvdXIgbWluZCBncm93cyBzdHJvbmdlciBlYWNoIHRpbWUgeW91IGZhY2UgYSBjaGFsbGVuZ2UuIEtlZXAgbW92aW5nIGZvcndhcmQgZXZlbiBpZiBwcm9ncmVzcyBmZWVscyBzbG93LiBIYXJkIGRheXMgdGVhY2ggbGVzc29ucyB0aGF0IGVhc3kgZGF5cyBjYW5ub3QuIEJlIHByb3VkIG9mIGhvdyBmYXIgeW91IGhhdmUgY29tZSBpbiB0aGlzIGpvdXJuZXkuIEdyZWF0IHRoaW5ncyBuZXZlciBjb21lIGZyb20gY29tZm9ydCB6b25lcy4gU3RheSBib2xkLCBzdGF5IGtpbmQsIGFuZCBsZXQgeW91ciBsaWdodCBzaGluZSBmb3Igb3RoZXJzLg==" },
+    3: { m: "TGVhcm5pbmcgaXMgYSB0cmVhc3VyZSB0aGF0IG5vIG9uZSBjYW4gc3RlYWwgZnJvbSB5b3UuIEVhY2ggcHJvYmxlbSB5b3Ugc29sdmUgbWFrZXMgeW91ciBicmFpbiBzaGFycGVyLiBDb3VyYWdlIGlzIG5vdCB0aGUgYWJzZW5jZSBvZiBmZWFyIGJ1dCBhY3Rpb24gZGVzcGl0ZSBpdC4gRG8gbm90IGNvbXBhcmUgeW91ciBmaXJzdCBjaGFwdGVyIHRvIHRoZSB0d2VudGlldGggY2hhcHRlciBvZiBhbm90aGVyIHBlcnNvbi4gRGlzY2lwbGluZSB3aWxsIGNhcnJ5IHlvdSB3aGVuIG1vdGl2YXRpb24gZmFkZXMuIFNtYWxsIHdpbnMgZXZlcnkgZGF5IGxlYWQgdG8gYmlnIHZpY3Rvcmllcy4gQXNrIHF1ZXN0aW9ucyBmcmVlbHkgYmVjYXVzZSBjdXJpb3NpdHkgdW5sb2NrcyBrbm93bGVkZ2UuIFlvdXIgZnV0dXJlIHNlbGYgd2lsbCB0aGFuayB5b3UgZm9yIHRoZSBlZmZvcnQgdG9kYXkuIEJlIHBhdGllbnQsIHRoZSBiZXN0IGZydWl0cyB0YWtlIHRpbWUgdG8gZ3Jvdy4gUmlzZSB1cCwgc2hvdyB1cCwgYW5kIGdpdmUgeW91ciBtYXhpbXVtIHplYWwgYW5kIGpveS4=" },
+    4: { m: "VGhlIG9ubHkgbGltaXQgdG8geW91ciBncm93dGggaXMgdGhlIG9uZSB5b3UgYWNjZXB0LiBTdHVkeSB3aXRoIHB1cnBvc2UgYW5kIHRoZSBncmFkZXMgd2lsbCBmb2xsb3cuIERpZmZpY3VsdCByb2FkcyBvZnRlbiBsZWFkIHRvIGJlYXV0aWZ1bCBkZXN0aW5hdGlvbnMuIE5ldmVyIHF1aXQganVzdCBiZWNhdXNlIHRoZSBwYXRoIGxvb2tzIHN0ZWVwLiBFdmVyeSBzbWFsbCBzdGVwIGNvdW50cyB0b3dhcmQgc29tZXRoaW5nIGdyZWF0LiBUcnVzdCB0aGUgcHJvY2VzcyBhbmQgZW5qb3kgdGhlIGNsaW1iLiBZb3VyIGF0dGl0dWRlIGRlY2lkZXMgeW91ciBhbHRpdHVkZSBpbiBsaWZlLiBNaXN0YWtlcyBkbyBub3QgbWFrZSB5b3Ugd2VhaywgdGhleSBtYWtlIHlvdSB3aXNlci4gS2VlcCB5b3VyIGV5ZXMgb24gdGhlIHByaXplIGFuZCB5b3VyIGZlZXQgb24gdGhlIGdyb3VuZC4gRml4IHlvdXIgbWluZHNldCBhbmQgYW1hemUgeW91cnNlbGYgd2l0aCB3aGF0IHlvdSBjYW4gZG8u" },
+    5: { m: "RHJlYW0gYmlnLCBzdGFydCBzbWFsbCwgYW5kIGFjdCBub3cuIEEgc3Ryb25nIHdpbGwgY2FuIGNvbnF1ZXIgYW55IG1vdW50YWluLiBIb3BlIGlzIHRoZSBmdWVsIHRoYXQga2VlcHMgYSBkcmVhbWVyIG1vdmluZy4gTmV2ZXIgYmUgYWZyYWlkIHRvIGFzayBmb3IgaGVscCB3aGVuIHlvdSBuZWVkIGl0LiBFYWNoIHN1bnJpc2UgYnJpbmdzIGEgZnJlc2ggY2hhbmNlIHRvIGltcHJvdmUuIFlvdXIgZWZmb3J0IHRvZGF5IGlzIHRoZSBrZXkgdG8gdG9tb3Jyb3cuIEJlIHRoZSBzdHVkZW50IHdobyBuZXZlciBzdG9wcyB0cnlpbmcuIEtub3dsZWRnZSBpcyBwb3dlciwgc28ga2VlcCByZWFkaW5nIGFuZCBsZWFybmluZy4gQ2VsZWJyYXRlIHByb2dyZXNzLCBubyBtYXR0ZXIgaG93IHNtYWxsLiBGYWNlIGV2ZXJ5IGV4YW0gd2l0aCBqb3ksIHplYWwsIGFuZCBxdWlldCBjb25maWRlbmNlLg==" }
+  };
+  var CLUES = [["PATTERNS", "(n.) Regular, repeated, or recurring forms or designs that can be observed and predicted."], ["FIBONACCI", "(adj.) Refers to the sequence 1, 1, 2, 3, 5, 8, … in which each term is the sum of the two preceding terms."], ["LANGUAGE", "(n.) A system of symbols and rules used to express ideas precisely, concisely, and powerfully."], ["BINARY", "(adj.) Describes an operation that combines two elements of a set to produce another element."], ["LOGIC", "(n.) The study of the principles of valid reasoning and correct inference."], ["INDUCTIVE", "(adj.) Describes reasoning that reaches a general conclusion from specific observations or examples."], ["DEDUCTIVE", "(adj.) Describes reasoning that reaches a specific conclusion from general premises or accepted facts."], ["POLYA", "(n.) Mathematician who proposed the four-step problem-solving method: understand, plan, carry out, look back."], ["CORRELATION", "(n.) A statistical measure of the strength and direction of the linear relationship between two variables."], ["REGRESSION", "(n.) A statistical method that finds the line of best fit to predict one variable from another."], ["EULERIAN", "(adj.) Describes a path or circuit that uses every edge of a graph exactly once."], ["HAMILTONIAN", "(adj.) Describes a path or circuit that visits every vertex of a graph exactly once."], ["APPORTIONMENT", "(n.) The process of dividing and distributing a fixed number of items among groups in proportion to their size."], ["VOTING", "(n.) The process of choosing among alternatives by expressing individual preferences on ballots."], ["INTEREST", "(n.) The amount paid for the use of borrowed money, usually a percentage of the principal."], ["CRYPTOGRAPHY", "(n.) The study and practice of writing and solving codes to keep messages secret."]];
+  var AZ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  var $ = function(id){ return document.getElementById(id); };
+
+  // --- seeded RNG ---
+  function hashStr(s){ var h = 2166136261 >>> 0; for (var i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h; }
+  function mulberry32(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function makeKey(seed){
+    var rnd = mulberry32(hashStr(seed));
+    var shift = 1 + Math.floor(rnd()*25); // 1..25
+    var enc = {}; AZ.split("").forEach(function(c,i){ enc[c] = AZ[(i + shift) % 26]; });
+    return enc; // plain -> cipher
+  }
+  function store(k, v){ try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify(v)); } catch(e){ return null; } }
+
+  var SITE_NAME = store("pf_name") || "";
+  if (SITE_NAME){ $("nameBox").classList.add("hidden"); $("hiName").textContent = SITE_NAME; $("hiBox").classList.remove("hidden"); }
+  var S = {}; // state
+  function begin(){
+    var name = SITE_NAME || $("pname").value.trim().replace(/\s+/g," ");
+    if (name.length < 3){ $("serr").textContent = "Please type your full name."; return; }
+    var set = $("pset").value;
+    S.name = name; S.set = set; S.filled = false;
+    S.plainFull = atob(DATA[set].m);
+    S.plain = S.plainFull.toUpperCase().replace(/[^A-Z]/g,"");
+    S.enc = makeKey(name.toUpperCase() + "|" + set);
+    S.clue = [CLUES[Math.floor(mulberry32(hashStr(name.toUpperCase() + "|" + set + "|clue"))() * CLUES.length)]];
+    S.cipher = S.plain.split("").map(function(c){ return S.enc[c]; }).join("");
+    S.present = {}; S.cipher.split("").forEach(function(c){ S.present[c]=1; });
+    S.saveKey = "mmwcipher|" + name.toUpperCase() + "|" + set;
+    var saved = store(S.saveKey) || {};
+    S.map = saved.map || {}; S.hist = saved.hist || []; S.t0 = saved.t0 || Date.now(); S.done = saved.done || null; S.cl = saved.cl || [false];
+    $("who").textContent = name; $("whoSet").textContent = "Set " + set;
+    window.scrollTo(0,0);
+    $("start").classList.add("hidden"); $("game").classList.remove("hidden");
+    renderClues(); render(); phase();
+    setInterval(tick, 1000); tick();
+  }
+  function save(){ store(S.saveKey, { map:S.map, hist:S.hist, t0:S.t0, done:S.done, cl:S.cl }); }
+  function fmt(sec){ var m=Math.floor(sec/60), s=sec%60; return (m<10?"0":"")+m+":"+(s<10?"0":"")+s; }
+  function tick(){ var end = S.done ? S.done : Date.now(); $("timer").textContent = fmt(Math.floor((end - S.t0)/1000)); }
+
+  function encW(w){ return w.split("").map(function(ch){ return S.enc[ch]; }).join(""); }
+  function renderClues(){
+    var C = S.clue;
+    $("clues").innerHTML = C.map(function(c, i){
+      var body = S.cl[i]
+        ? '<div class="res ok">Correct — ' + c[0] + '</div>'
+        : '<div class="crow"><input type="text" id="cg' + i + '" maxlength="20" autocapitalize="characters" autocomplete="off" placeholder="Type the word"><button class="btn" data-i="' + i + '">Check</button></div><div class="res" id="cr' + i + '"></div>';
+      return '<div class="clue"><code class="cw">' + encW(c[0]) + '</code><div class="def">' + c[1] + '</div>' + body + '</div>';
+    }).join("");
+    Array.prototype.forEach.call(document.querySelectorAll("#clues button"), function(b){
+      b.onclick = function(){ checkClue(+b.getAttribute("data-i")); };
+      var inp = $("cg" + b.getAttribute("data-i"));
+      inp.addEventListener("keydown", function(e){ if (e.key === "Enter") checkClue(+b.getAttribute("data-i")); });
+    });
+    $("clues2").innerHTML = C.map(function(c){ return '<p><code class="cw sm">' + encW(c[0]) + '</code> = <b>' + c[0] + '</b></p><p class="muted">' + c[1] + '</p>'; }).join("");
+    if (S.cl.some(Boolean)) $("hint").classList.remove("hidden");
+  }
+  function checkClue(i){
+    var g = $("cg" + i).value.toUpperCase().replace(/[^A-Z]/g,"");
+    var r = $("cr" + i);
+    if (!g.length){ r.className = "res bad"; r.textContent = "Enter a word."; return; }
+    if (g === S.clue[i][0]){
+      S.cl[i] = true; save(); renderClues(); phase();
+    } else { r.className = "res bad"; r.textContent = "Incorrect — try again."; }
+  }
+  function phase(){
+    var all = S.cl.every(Boolean);
+    if (all && !S.filled){
+      S.filled = true;
+    }
+    $("phase1").classList.toggle("hidden", all);
+    $("phase2").classList.toggle("hidden", !all);
+  }
+  function render(){
+    $("cipher").innerHTML = S.cipher.split("").map(function(c){
+      return S.map[c] ? '<span class="s">' + S.map[c].toLowerCase() + '</span>' : c;
+    }).join("");
+    checkSolved();
+  }
+  function msg(t){ $("msg").textContent = t || ""; }
+
+  function apply(){
+    if (S.done) return;
+    var c = $("cin").value.toUpperCase().trim(), p = $("pin").value.toUpperCase().trim();
+    if (!/^[A-Z]$/.test(c)){ msg("Enter one cipher letter (A–Z)."); return; }
+    if (p && !/^[A-Z]$/.test(p)){ msg("Replacement must be one letter (A–Z)."); return; }
+    if (!S.present[c]){ msg("Cipher letter " + c + " does not appear in the message."); return; }
+    var prev = JSON.parse(JSON.stringify(S.map));
+    var note = "";
+    if (p){
+      for (var k in S.map){ if (k !== c && S.map[k] === p){ note = "Note: " + p.toLowerCase() + " was assigned to " + k + "; moved to " + c + "."; delete S.map[k]; } }
+      S.map[c] = p;
+    } else {
+      if (!S.map[c]){ msg("No mapping to remove for " + c + "."); return; }
+      delete S.map[c];
+    }
+    S.hist.push(prev); if (S.hist.length > 100) S.hist.shift();
+    msg(note); $("cin").value = ""; $("pin").value = ""; $("cin").focus();
+    save(); render();
+  }
+  function undo(){ if (S.done || !S.hist.length) return; S.map = S.hist.pop(); msg(""); save(); render(); }
+  function reset(){ if (S.done) return; if (!confirm("Clear all mappings?")) return; S.hist.push(S.map); S.map = {}; msg(""); save(); render(); }
+
+  function checkSolved(){
+    var ok = Object.keys(S.present).every(function(c){ return S.map[c] && S.enc[S.map[c]] === c; });
+    if (!ok){ $("solved").classList.add("hidden"); return; }
+    if (!S.done){ S.done = Date.now(); save(); setTimeout(function(){ window.scrollTo({top:0, behavior:"smooth"}); }, 50); }
+    var sec = Math.floor((S.done - S.t0)/1000);
+    var chk = (hashStr(S.name.toUpperCase() + "|" + S.set + "|" + sec + "|mmw") % 46656).toString(36).toUpperCase();
+    while (chk.length < 3) chk = "0" + chk;
+    var initials = S.name.toUpperCase().replace(/[^A-Z ]/g,"").split(" ").filter(Boolean).map(function(w){ return w[0]; }).join("");
+    $("stime").textContent = "Time: " + fmt(sec);
+    $("scode").textContent = "S" + S.set + "-" + initials + "-" + fmt(sec).replace(":","") + "-" + chk;
+    $("plain").textContent = S.plainFull;
+    $("solved").classList.remove("hidden");
+    $("cin").disabled = $("pin").disabled = true;
+    ["apply","undo","reset"].forEach(function(id){ $(id).disabled = true; });
+    var code = $("scode").textContent, all = store("pf_actdone") || {};
+    all["mmw-cipher|" + S.name.toLowerCase()] = { code: code, set: S.set, time: fmt(sec), at: S.done };
+    store("pf_actdone", all);
+    tick();
+  }
+
+  $("go").onclick = begin;
+  $("apply").onclick = apply;
+  $("undo").onclick = undo;
+  $("reset").onclick = reset;
+  $("cin").addEventListener("input", function(){ if (this.value) $("pin").focus(); });
+  $("pin").addEventListener("keydown", function(e){ if (e.key === "Enter") apply(); });
+})();
+</script>
+</body>
+</html>

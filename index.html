@@ -50,7 +50,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .exam .actions{display:flex;gap:10px;margin-top:14px}
 .exam .actions button{flex:1}
 .status{font-size:.9rem;color:var(--muted);text-align:center;margin-top:18px}
-.tabs{display:flex;gap:10px;margin:4px 0 6px}.tabs button{flex:1;white-space:nowrap;padding:12px 6px;font-size:.95rem;background:#fff;border:2px solid var(--line);color:var(--pink-dark)}
+.tabs{display:flex;gap:8px;margin:4px 0 6px}.tabs button{flex:1;min-width:0;white-space:nowrap;padding:12px 4px;font-size:.88rem;background:#fff;border:2px solid var(--line);color:var(--pink-dark)}
 .tabs button.on{background:linear-gradient(135deg,var(--btn),var(--btn2));border-color:transparent;color:var(--btn-ink)}.tabs .n{opacity:.8;font-weight:500}
 .empty{text-align:center;color:var(--muted)}
 .ver{margin-top:22px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:.88rem;font-weight:600;color:var(--muted)}
@@ -162,7 +162,7 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
   <button id="bSubjBack" class="back">‹ Subjects</button>
   <h1 id="subjTitle"></h1>
   <p class="sub" id="subjSub"></p>
-  <div class="tabs"><button id="tExam" data-k="exam">Examinations</button><button id="tQuiz" data-k="quiz">Quizzes</button></div>
+  <div class="tabs"><button id="tExam" data-k="exam">Examinations</button><button id="tQuiz" data-k="quiz">Quizzes</button><button id="tAct" data-k="activity">Activities</button></div>
   <div id="examList"></div>
   <div class="status"><span class="pill netPill">…</span> <span class="queueMsg"></span> <button class="link bSync hidden">Upload now</button></div>
   <p class="muted dlMsg" style="text-align:center;margin:4px 0 0"></p>
@@ -323,15 +323,16 @@ $("bNotMe").onclick = () => { ls.del(K.name); NAME=""; $("fLast").value=""; $("f
 /* ---------- 2a. subject selection ---------- */
 const subjOf = e => e.subject || SUBJECTS[0].id;
 const kindOf = e => e.kind === "quiz" ? "quiz" : "exam";
-const plural = (n, w) => `${n} ${w}${n === 1 ? "" : (w === "quiz" ? "zes" : "s")}`;
+const plural = (n, w) => n === 1 ? `1 ${w}` : `${n} ${w === "quiz" ? "quizzes" : w === "activity" ? "activities" : w + "s"}`;
+const ACTS = typeof ACTIVITIES !== "undefined" ? ACTIVITIES : [];
 function goSubjects(){
   $("hiName").textContent = NAME;
   const box = $("subjList"); box.innerHTML = "";
   SUBJECTS.forEach((sb, i) => {
     const list = EXAMS.filter(e => subjOf(e) === sb.id);
-    const nE = list.filter(e => kindOf(e) === "exam").length, nQ = list.filter(e => kindOf(e) === "quiz").length;
+    const nE = list.filter(e => kindOf(e) === "exam").length, nQ = list.filter(e => kindOf(e) === "quiz").length, nA = ACTS.filter(a => subjOf(a) === sb.id).length;
     const b = document.createElement("button"); b.className = `subj s${i % 2}`;
-    b.innerHTML = `<span class="ic">${esc(sb.icon || "∑")}</span><span class="tx"><span class="t">${esc(sb.title)}</span><span class="m">${plural(nE,"exam")} · ${plural(nQ,"quiz")}</span></span><span class="go">›</span>`;
+    b.innerHTML = `<span class="ic">${esc(sb.icon || "∑")}</span><span class="tx"><span class="t">${esc(sb.title)}</span><span class="m">${plural(nE,"exam")} · ${plural(nQ,"quiz")}${nA ? " · " + plural(nA,"activity") : ""}</span></span><span class="go">›</span>`;
     b.onclick = () => { ls.set(K.subj, sb.id); goHome(); };
     box.appendChild(b);
   });
@@ -348,12 +349,29 @@ async function goHome(){
   $("subjTitle").textContent = sb.title; $("subjSub").textContent = `Hi, ${NAME}`;
   const done = ls.get(K.done, {});
   const box = $("examList"); box.innerHTML = "";
-  let tab = ls.get(K.tab, "exam"); if(tab !== "quiz") tab = "exam";
-  for(const b of [$("tExam"), $("tQuiz")]){
-    const k = b.dataset.k, n = inSubj.filter(e => kindOf(e) === k).length;
-    b.innerHTML = `${k === "quiz" ? "Quizzes" : "Examinations"} <span class="n">(${n})</span>`;
+  let tab = ls.get(K.tab, "exam"); if(tab !== "quiz" && tab !== "activity") tab = "exam";
+  const acts = ACTS.filter(a => subjOf(a) === sb.id);
+  for(const b of [$("tExam"), $("tQuiz"), $("tAct")]){
+    const k = b.dataset.k, n = k === "activity" ? acts.length : inSubj.filter(e => kindOf(e) === k).length;
+    b.innerHTML = `${k === "quiz" ? "Quizzes" : k === "activity" ? "Activities" : "Exams"} <span class="n">(${n})</span>`;
     b.classList.toggle("on", k === tab);
     b.onclick = () => { ls.set(K.tab, k); goHome(); };
+  }
+  if(tab === "activity"){
+    const done = ls.get("pf_actdone", {});
+    if(!acts.length) box.innerHTML = `<div class="card empty">No activities yet.</div>`;
+    for(const a of acts){
+      const d = done[a.id + "|" + NAME.toLowerCase()];
+      const el = document.createElement("div"); el.className = "card exam";
+      el.innerHTML = `<div class="bar"><h2>${esc(a.title)}</h2>${d ? `<span class="pill ok">Completed ✓</span>` : `<span class="pill">Activity</span>`}</div>
+        <p class="muted">${esc(a.topic)} · ${esc(a.info)}</p>
+        ${d ? `<p>Completion code: <b>${esc(d.code)}</b></p>` : ""}
+        <div class="actions"><button class="btn" data-go>${d ? "Open again" : "Open activity"}</button></div>`;
+      el.querySelector("[data-go]").onclick = () => { location.href = a.url; };
+      box.appendChild(el);
+    }
+    refreshStatus(); show("sHome"); autoDownload(); pullDone();
+    return;
   }
   const list = inSubj.filter(e => kindOf(e) === tab);
   if(!list.length) box.innerHTML = `<div class="card empty">No ${tab === "quiz" ? "quizzes" : "examinations"} yet.</div>`;
