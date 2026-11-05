@@ -1,5 +1,5 @@
 // Offline support. App files: network-first (always fresh when online). Exam banks: kept once downloaded.
-const SHELL = "pf-shell-v7";
+const SHELL = "pf-shell-v8";
 const FILES = ["./", "index.html", "config.js", "manifest.json", "icon-180-v2.png", "icon-192-v2.png", "icon-512-v2.png", "activities/cipher.html"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(SHELL).then(c => c.addAll(FILES))); self.skipWaiting(); });
 self.addEventListener("activate", e => {

@@ -9,6 +9,7 @@
 <link rel="icon" href="../icon-192-v2.png">
 <link rel="apple-touch-icon" sizes="180x180" href="../icon-180-v2.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<script src="../config.js"></script>
 <style>
 :root{
   --pink:#ee7fb0; --pink-dark:#9c2a63; --pink-soft:#fde9f2; --line:#f7d6e5;
@@ -114,6 +115,7 @@ code.cw.sm{display:inline;font-size:1rem;padding:2px 8px;border-radius:8px;lette
       <div id="stime"></div>
       <div class="code" id="scode"></div>
       <p class="muted">Show this completion code to your teacher.</p>
+      <span class="pill" id="upl">Saved · sends when online</span>
       <div id="plain"></div>
     </div>
     <div class="card">
@@ -269,8 +271,38 @@ code.cw.sm{display:inline;font-size:1rem;padding:2px 8px;border-radius:8px;lette
     var code = $("scode").textContent, all = store("pf_actdone") || {};
     all["mmw-cipher|" + S.name.toLowerCase()] = { code: code, set: S.set, time: fmt(sec), at: S.done };
     store("pf_actdone", all);
+    queueResult(code, sec);
     tick();
   }
+
+  // ---- upload result to the site's Google Sheet (Activities tab); queued if offline ----
+  function pad(n){ return (n<10?"0":"") + n; }
+  function fmtTime(d){ var h=d.getHours(), ap=h<12?"AM":"PM"; h=h%12||12; return h+":"+pad(d.getMinutes())+":"+pad(d.getSeconds())+" "+ap; }
+  function queueResult(code, sec){
+    var t1 = new Date(S.t0), t2 = new Date(S.done);
+    var rec = { kind:"activity", id:"cipher|" + S.name.toLowerCase() + "|" + S.set, activity:"Cipher Decoder", name:S.name,
+      set:"Set " + S.set, clue:S.clue[0][0], code:code,
+      date:t1.getFullYear()+"-"+pad(t1.getMonth()+1)+"-"+pad(t1.getDate()), timeStarted:fmtTime(t1), timeEnded:fmtTime(t2),
+      duration:Math.floor(sec/60)+" min "+(sec%60)+" sec" };
+    var q = store("pf_queue") || [];
+    if (!q.some(function(x){ return x.kind === "activity" && x.id === rec.id; })) { q.push(rec); store("pf_queue", q); }
+    sendQueue();
+  }
+  function sendQueue(){
+    if (typeof API_URL === "undefined" || !navigator.onLine) return;
+    var q = (store("pf_queue") || []).filter(function(x){ return x.kind === "activity"; });
+    if (!q.length) return;
+    fetch(API_URL, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify({records:q}) })
+      .then(function(res){ return res.json(); })
+      .then(function(j){
+        if (!(j && j.ok)) return;
+        var ids = q.map(function(x){ return x.id; });
+        store("pf_queue", (store("pf_queue") || []).filter(function(x){ return !(x.kind === "activity" && ids.indexOf(x.id) >= 0); }));
+        var u = $("upl"); if (u){ u.textContent = "Result sent to your teacher ✓"; u.className = "pill ok"; }
+      }).catch(function(){});
+  }
+  window.addEventListener("online", sendQueue);
+  sendQueue();
 
   $("go").onclick = begin;
   $("apply").onclick = apply;
