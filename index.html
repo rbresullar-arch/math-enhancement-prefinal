@@ -88,6 +88,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .timer.low{color:var(--bad)}
 .qtype{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
 .qtext{font-size:1.12rem;margin:8px 0 12px}
+.qgiven{white-space:pre-wrap;background:var(--pink-soft);border-left:4px solid var(--pink);border-radius:8px;padding:10px 12px;margin:8px 0 4px;font-size:.98rem;line-height:1.5}.qgiven.code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92rem}.qgiven .gl{display:block;font-family:inherit;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--pink-dark);margin-bottom:4px}
 .choice{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;background:#fff;border:2px solid var(--line);border-radius:16px;color:var(--ink);font-weight:500;margin:8px 0;padding:13px}
 .choice .ltr{flex:0 0 32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--pink-soft);color:var(--pink-dark);font-weight:700}
 .choice.sel{border-color:var(--pink);background:var(--pink-soft)}
@@ -226,6 +227,7 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
   </div>
   <div id="qCard" class="card">
     <div class="bar"><b id="qNum"></b><span id="qType" class="qtype"></span></div>
+    <div id="qGiven" class="qgiven hidden"></div>
     <div id="qText" class="qtext"></div>
     <div id="qTable" class="qtwrap"></div>
     <div id="qFig" class="qfig"></div>
@@ -610,6 +612,8 @@ function render(){
   const it = items(), A = answers(), q = it[cur], n = it.length;
   $("qNum").textContent = `Question ${cur+1} of ${n}`;
   $("qType").textContent = mode==="practice" ? "practice" : `${q.type} · ${EXAM.points[q.type]||1} pt${(EXAM.points[q.type]||1)>1?"s":""}`;
+  $("qGiven").classList.toggle("hidden", !q.g); $("qGiven").classList.toggle("code", !!q.gc);   // shared "given" information
+  $("qGiven").innerHTML = q.g ? `<span class="gl">${q.gc ? "Python code" : "Given"}</span>${esc(q.g)}` : "";
   $("qText").textContent = q.q;
   $("qTable").innerHTML = q.t ? `<table class="qt"><tr>${q.t.h.map(h=>`<th>${esc(h)}</th>`).join("")}</tr>${q.t.r.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</table>` : "";
   $("qFig").innerHTML = q.f || "";   // figure (SVG from the encrypted bank)
@@ -665,7 +669,7 @@ function renderReview(rv){
       return `<div class="choice${cls}"><span class="ltr">${"ABCD"[j]}</span><span>${img ? o : esc(o)}${tag ? `<span class="tag">${tag}</span>` : ""}</span></div>`;
     }).join("");
     return `<div class="card rv"><div class="bar"><b>Question ${i+1}</b>${pill}</div>
-      <div class="qtext">${esc(v.q)}</div>${v.f ? `<div class="qfig">${v.f}</div>` : ""}
+      ${v.g ? `<div class="qgiven${v.gc ? " code" : ""}"><span class="gl">${v.gc ? "Python code" : "Given"}</span>${esc(v.g)}</div>` : ""}<div class="qtext">${esc(v.q)}</div>${v.f ? `<div class="qfig">${v.f}</div>` : ""}
       <div class="rvo"><div class="${img ? "img" : ""}">${opts}</div></div>
       ${v.x ? `<div class="expl"><b>Why:</b> ${esc(v.x)}</div>` : ""}</div>`;
   }).join("");

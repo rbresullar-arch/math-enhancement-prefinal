@@ -114,6 +114,25 @@ const EXAMS = [
       "The proctor will handle your questions. Raise your hand, say “Excuse me, ma’am/sir”.",
       "No borrowing of calculators allowed. Use your own scientific calculator."
     ]
+  },
+  {
+    id: "discrete-math-set-theory",
+    subject: "dm",
+    title: "Discrete Mathematics — Set Theory Examination",
+    topic: "Set Notation · Set Operations · Membership and Subset · Venn Diagrams · Sets in Python · More Set Concepts",
+    info: "50 items · 50 points · 75 minutes · Sets A–C",
+    bank: "exams/discrete-math-set-theory.enc.js",
+    minutes: 75,
+    shuffle: true,
+    points: { "Set Notation": 1, "Set Operations": 1, "Membership and Subset": 1, "Venn Diagram Problem": 1, "Sets in Python": 1, "More Set Concepts": 1 },
+    rules: [
+      "Read each item carefully and tap the letter of the best answer. Only one answer is correct.",
+      "Some items share the same given information (shown in the pink box). Read it before answering.",
+      "No alteration of answers allowed. Once submitted, answers can no longer be changed.",
+      "Cheating/coaching deemed by the proctor will forfeit your entry for the examination.",
+      "Keep the exam page open. Do not refresh, close, or switch to other apps or browser tabs.",
+      "The proctor will handle your questions. Raise your hand, say “Excuse me, ma’am/sir”."
+    ]
   }
 ];
 
@@ -134,6 +153,7 @@ const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
+  { v: "2.7", date: "2026-11-09", notes: ["Discrete Mathematics — Set Theory Examination (50 items, Sets A–C).", "Items can show shared “given” information and Python code above the question."] },
   { v: "2.6", date: "2026-11-09", notes: ["New subject: Discrete Mathematics.", "Discrete Mathematics — Prefinal Examination (Functions, 30 items, Sets A–C)."] },
   { v: "2.5", date: "2026-11-09", notes: ["Abstract Reasoning — Final Examination (40 picture items, shuffled per student).", "Results now record each answer with the correct answer, for checking wrong answers."] },
   { v: "2.4", date: "2026-11-05", notes: ["New Activities tab. Math in the Modern World: Cipher Decoder (Caesar cipher).", "Cipher Decoder: message set assigned randomly per student.", "Cipher Decoder results go to the Google Sheet (Activities tab)."] },
