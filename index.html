@@ -678,7 +678,7 @@ function record(status){
     duration:t2?`${Math.floor((t2-t1)/60000)} min ${Math.round((t2-t1)/1000)%60} sec`:"",
     score:s.score ?? "", total:s.total ?? "", percent:s.percent ?? "",
     flags:att.flags.length, flagDetails:att.flags.join("; "),
-    answers:origAnswers().map((a,i)=>`${i+1}:${a===null?"-":"ABCD"[a]}`).join(" "), marks:s.marks || "" };
+    answers:origAnswers().map((a,i)=>`${i+1}:${a===null?"-":"ABCD"[a]}`).join(" "), marks:s.marks || "", correct:s.correct || "", order:s.order || "" };
 }
 function origAnswers(){   // answers in bank order (question no. and letter as stored in the bank)
   if(!VIEW) return att.answers.slice();
@@ -689,22 +689,30 @@ function origAnswers(){   // answers in bank order (question no. and letter as s
 async function finish(auto){
   clearInterval(timerId); endCoach();
   const it = BANKDATA.sets[att.setIndex].items, P = EXAM.points, salt = BANKDATA.keySalt;
-  let score=0, total=0; const marks=Array(it.length).fill("✗");
+  let score=0, total=0;
+  // find the correct choice of every item (also recorded, so a student's wrong answers can be checked later)
+  const rightAt = [];
+  for(let i=0;i<VIEW.length;i++){
+    const v = VIEW[i]; let right = -1;
+    for(let j=0;j<v.o.length;j++) if((await sha(`${salt}|${att.setIndex}|${v.qi}|${v.o[j]}`)) === v.k){ right = j; break; }
+    rightAt.push(right);
+  }
+  const L = j => j===null || j<0 ? "-" : "ABCD"[j];
+  const mk = Array(it.length).fill(""), key = Array(it.length).fill("-"), shown = Array(it.length).fill(0);
   for(let i=0;i<VIEW.length;i++){
     const v = VIEW[i], a = att.answers[i], pts = P[v.type]||1; total += pts;
-    const ok = a!==null && (await sha(`${salt}|${att.setIndex}|${v.qi}|${v.o[a]}`)) === v.k;
-    if(ok){ score += pts; marks[v.qi] = "✓"; }
+    const ok = a!==null && a === rightAt[i];
+    if(ok) score += pts;
+    const ans = a===null ? "-" : L(v.om[a]), cor = rightAt[i] < 0 ? "-" : L(v.om[rightAt[i]]);   // letters as stored in the bank (= answer key)
+    key[v.qi] = cor; shown[v.qi] = i + 1;
+    mk[v.qi] = `${v.qi+1}:${ans}${ok ? "✓" : "✗" + cor}`;
   }
   // quizzes: show correct answers + explanations after submitting (set review:false in config.js to turn off)
   const showReview = EXAM.kind === "quiz" && EXAM.review !== false;
-  let rv = [];
-  if(showReview) for(let i=0;i<VIEW.length;i++){
-    const v = VIEW[i]; let right = -1;
-    for(let j=0;j<v.o.length;j++) if((await sha(`${salt}|${att.setIndex}|${v.qi}|${v.o[j]}`)) === v.k){ right = j; break; }
-    rv.push({v, picked: att.answers[i], right});
-  }
+  const rv = showReview ? VIEW.map((v, i) => ({v, picked: att.answers[i], right: rightAt[i]})) : [];
   att.ended = Date.now();
-  scoreCache = {score, total, percent:Math.round(score/total*1000)/10, marks:marks.join("")};
+  scoreCache = {score, total, percent:Math.round(score/total*1000)/10, marks:mk.join(" "),
+    correct:key.map((c,i)=>`${i+1}:${c}`).join(" "), order:shown.map((n,i)=>`${i+1}→#${n}`).join(" ")};
   const rec = record(auto ? "Submitted (time up)" : "Submitted");
   enqueue(rec);
   const done = ls.get(K.done, {}); done[nkey(att.exam,att.name)] = {score, total, at:att.ended}; ls.set(K.done, done);

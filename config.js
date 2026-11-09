@@ -76,6 +76,24 @@ const EXAMS = [
       "Keep the quiz page open. Do not refresh, close, or switch to other apps or browser tabs.",
       "The proctor will handle your questions. Raise your hand, say “Excuse me, ma’am/sir”."
     ]
+  },
+  {
+    id: "abstract-reasoning-final-exam",
+    subject: "me",
+    title: "Abstract Reasoning — Final Examination",
+    topic: "Series · Analogy · Odd One Out · Matrix · Mirror and Rotation",
+    info: "40 items · 40 points · 60 minutes",
+    bank: "exams/abstract-reasoning-final-exam.enc.js",
+    minutes: 60,
+    shuffle: true,
+    points: { "Series": 1, "Analogy": 1, "Odd One Out": 1, "Matrix": 1, "Mirror and Rotation": 1 },
+    rules: [
+      "Each item has a picture. Look at it carefully, then tap the letter of your choice.",
+      "No alteration of answers allowed. Once submitted, answers can no longer be changed.",
+      "Cheating/coaching deemed by the proctor will forfeit your entry for the examination.",
+      "Keep the exam page open. Do not refresh, close, or switch to other apps or browser tabs.",
+      "The proctor will handle your questions. Raise your hand, say “Excuse me, ma’am/sir”."
+    ]
   }
 ];
 
@@ -96,6 +114,7 @@ const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
+  { v: "2.5", date: "2026-11-09", notes: ["Abstract Reasoning — Final Examination (40 picture items, shuffled per student).", "Results now record each answer with the correct answer, for checking wrong answers."] },
   { v: "2.4", date: "2026-11-05", notes: ["New Activities tab. Math in the Modern World: Cipher Decoder (Caesar cipher).", "Cipher Decoder: message set assigned randomly per student.", "Cipher Decoder results go to the Google Sheet (Activities tab)."] },
   { v: "2.3", date: "2026-11-04", notes: ["Admin: tap “Mathematics” to sign in, see all codes and create new ones.", "Fixed: uploads were saved to the Sheet but the phone kept showing them as waiting.", "Scores for the Prelim and Abstract Reasoning now show on other devices."] },
   { v: "2.2", date: "2026-11-04", notes: ["Simpler footer: version number with a refresh button to check for updates."] },

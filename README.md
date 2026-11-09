@@ -12,5 +12,6 @@
 - Flags (leaving the app, copy/paste, etc.) are logged only.
 
 **Adding an exam or quiz:** add an entry to `EXAMS` in `config.js` (with `subject:` set to an id from `SUBJECTS`) and its encrypted bank in `/exams`. Quizzes need `kind: "quiz"` (listed under Quizzes); others are listed under Examinations. Add a line to `VERSIONS` in `config.js` for each update.
+**Result columns for checking answers** (item numbers = bank order = answer key): `answers` (student's letter), `marks` (e.g. `6:B✗C` = item 6 answered B, correct C), `correct` (the key), `order` (e.g. `6→#2` = shown as question 2 on that phone).
 Optional fields: `minutes` (time limit), `shuffle: true` (per-student question + choice order), `rules` (shown before the exam).
 Codes not listed in the Apps Script `CODES` are accepted by the bank and timed on the device.
