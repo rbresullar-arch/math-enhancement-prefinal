@@ -5,7 +5,8 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyiqxFMAFSW4ni5WNmBnz2Y
 // Subjects shown on the first screen. Each exam/quiz below has subject: one of these ids.
 const SUBJECTS = [
   { id: "me",  title: "Math Enhancement",         icon: "∑" },
-  { id: "mmw", title: "Math in the Modern World", icon: "φ" }
+  { id: "mmw", title: "Math in the Modern World", icon: "φ" },
+  { id: "dm",  title: "Discrete Mathematics",     icon: "∀" }
 ];
 
 // Exams shown on the home page. To add an exam: add an entry + its encrypted bank file in /exams.
@@ -94,6 +95,25 @@ const EXAMS = [
       "Keep the exam page open. Do not refresh, close, or switch to other apps or browser tabs.",
       "The proctor will handle your questions. Raise your hand, say “Excuse me, ma’am/sir”."
     ]
+  },
+  {
+    id: "discrete-math-prefinal",
+    subject: "dm",
+    title: "Discrete Mathematics — Prefinal Examination",
+    topic: "Functions: Function or Not · Domain, Codomain, Range · Classifying Functions · Composition and Inverse · Floor and Ceiling",
+    info: "30 items · 30 points · 60 minutes · Sets A–C",
+    bank: "exams/discrete-math-prefinal.enc.js",
+    minutes: 60,
+    shuffle: true,
+    points: { "Function or Not?": 1, "Domain, Codomain, and Range": 1, "Classifying Functions": 1, "Composition and Inverse": 1, "Floor and Ceiling Functions": 1 },
+    rules: [
+      "Tap the letter of your choice for each item.",
+      "No alteration of answers allowed. Once submitted, answers can no longer be changed.",
+      "Cheating/coaching deemed by the proctor will forfeit your entry for the examination.",
+      "Keep the exam page open. Do not refresh, close, or switch to other apps or browser tabs.",
+      "The proctor will handle your questions. Raise your hand, say “Excuse me, ma’am/sir”.",
+      "No borrowing of calculators allowed. Use your own scientific calculator."
+    ]
   }
 ];
 
@@ -114,6 +134,7 @@ const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
+  { v: "2.6", date: "2026-11-09", notes: ["New subject: Discrete Mathematics.", "Discrete Mathematics — Prefinal Examination (Functions, 30 items, Sets A–C)."] },
   { v: "2.5", date: "2026-11-09", notes: ["Abstract Reasoning — Final Examination (40 picture items, shuffled per student).", "Results now record each answer with the correct answer, for checking wrong answers."] },
   { v: "2.4", date: "2026-11-05", notes: ["New Activities tab. Math in the Modern World: Cipher Decoder (Caesar cipher).", "Cipher Decoder: message set assigned randomly per student.", "Cipher Decoder results go to the Google Sheet (Activities tab)."] },
   { v: "2.3", date: "2026-11-04", notes: ["Admin: tap “Mathematics” to sign in, see all codes and create new ones.", "Fixed: uploads were saved to the Sheet but the phone kept showing them as waiting.", "Scores for the Prelim and Abstract Reasoning now show on other devices."] },
