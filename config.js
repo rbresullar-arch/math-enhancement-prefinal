@@ -118,7 +118,7 @@ const EXAMS = [
   {
     id: "discrete-math-set-theory",
     subject: "dm",
-    title: "Discrete Mathematics — Set Theory Examination",
+    title: "Discrete Mathematics — Midterm Examination",
     topic: "Set Notation · Set Operations · Membership and Subset · Venn Diagrams · Sets in Python · More Set Concepts",
     info: "50 items · 50 points · 75 minutes · Sets A–C",
     bank: "exams/discrete-math-set-theory.enc.js",
@@ -153,6 +153,7 @@ const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
+  { v: "2.8", date: "2026-11-09", notes: ["Set Theory exam renamed to “Discrete Mathematics — Midterm Examination”."] },
   { v: "2.7", date: "2026-11-09", notes: ["Discrete Mathematics — Set Theory Examination (50 items, Sets A–C).", "Items can show shared “given” information and Python code above the question."] },
   { v: "2.6", date: "2026-11-09", notes: ["New subject: Discrete Mathematics.", "Discrete Mathematics — Prefinal Examination (Functions, 30 items, Sets A–C)."] },
   { v: "2.5", date: "2026-11-09", notes: ["Abstract Reasoning — Final Examination (40 picture items, shuffled per student).", "Results now record each answer with the correct answer, for checking wrong answers."] },
