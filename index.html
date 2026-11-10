@@ -96,6 +96,20 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .nav{display:flex;gap:10px;margin-top:12px}
 .nav button{flex:1}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:8px}
+/* cipher exam */
+.ctext{font:600 1.02rem/1.8 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;word-break:break-word;background:var(--pink-soft);border-radius:12px;padding:12px;margin:8px 0}
+.cmap{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px;margin:10px 0}
+.cmap span{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:44px;border:2px solid var(--line);border-radius:10px;font:800 1rem ui-monospace,Menlo,monospace;color:var(--pink-dark);background:#fff;line-height:1.1}
+.cmap span.in{background:var(--pink-soft);border-color:var(--btn2)}.cmap span small{font:700 .7rem system-ui;color:var(--pink-dark)}
+.center{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end;margin-top:10px}.center label{font-size:.85rem;margin:0 0 4px}
+.center input{width:100%;text-align:center;font:800 1.6rem ui-monospace,Menlo,monospace;text-transform:uppercase;padding:8px;border:2px solid var(--line);border-radius:14px}
+.center input:focus{border-color:var(--pink);outline:none}.center .arr{font-size:1.5rem;color:var(--pink);padding-bottom:12px}
+.cmsg{min-height:1.4em;margin-top:6px;font-weight:600;font-size:.92rem;color:var(--pink-dark)}.cmsg.bad{color:var(--bad)}
+.cdec{position:relative;font:600 1.02rem/1.8 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em;word-break:break-word;border:2px dashed var(--line);border-radius:12px;padding:12px;margin:8px 0;min-height:80px;user-select:none;-webkit-user-select:none}
+.cdec.blur .txt{filter:blur(7px);opacity:.75}
+.cdec .u{color:var(--muted)}
+.cpeek{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:6px}
+.cpeek .left{font-weight:700;color:var(--pink-dark)}
 .grid button{padding:0;min-height:42px;background:#fff;border:2px solid var(--line);color:var(--ink)}
 .grid button.ans{background:var(--btn);border-color:var(--btn2);color:var(--btn-ink)}
 .grid button.cur{outline:3px solid var(--pink-dark);outline-offset:2px}
@@ -234,8 +248,26 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
     <div id="choices"></div>
     <div class="nav"><button id="bPrev" class="btn2">◀ Back</button><button id="bNext" class="btn">Next ▶</button></div>
   </div>
+  <div id="cCard" class="card hidden">
+    <div class="bar"><b id="cNum"></b><span class="qtype" id="cInfo"></span></div>
+    <div class="muted" style="margin-top:6px">Encrypted paragraph (Caesar cipher):</div>
+    <div id="cText" class="ctext"></div>
+    <div class="center">
+      <div><label for="cIn">Cipher letter</label><input id="cIn" maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false"></div>
+      <div class="arr">→</div>
+      <div><label for="pIn">Real letter</label><input id="pIn" maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false"></div>
+    </div>
+    <button id="bEnter" class="btn full" style="margin-top:10px">Enter letter</button>
+    <div id="cMsg" class="cmsg"></div>
+    <div class="muted" style="margin-top:8px">Cipher letters in this paragraph (✓ = you entered a letter; you can enter it again to change it):</div>
+    <div id="cMap" class="cmap"></div>
+    <div class="muted">Your decoded paragraph (hidden — use a peek to check it):</div>
+    <div id="cDec" class="cdec blur"><span class="txt" id="cDecTxt"></span></div>
+    <div class="cpeek"><span class="left" id="cPeekLeft"></span><button id="bPeek" class="btn2">👁 Peek</button></div>
+    <div class="nav"><button id="cPrev" class="btn2">◀ Back</button><button id="cNext" class="btn">Next ▶</button></div>
+  </div>
   <div id="gridCard" class="card">
-    <div class="bar" style="margin-bottom:8px"><b style="font-size:.95rem">Questions</b><span class="muted" style="font-size:.85rem">pink = answered</span></div>
+    <div class="bar" style="margin-bottom:8px"><b style="font-size:.95rem" id="gridLbl">Questions</b><span class="muted" style="font-size:.85rem">pink = answered</span></div>
     <div id="grid" class="grid"></div>
   </div>
   <button id="bSubmit" class="btn full">Submit</button>
@@ -556,7 +588,14 @@ $("bCode").onclick = async () => {
   att = { id:uid(), exam:EXAM.id, examTitle:EXAM.title, name:NAME, code:u.label, online, expires,
           setIndex:si, setName:BANKDATA.sets[si].name, answers:Array(BANKDATA.sets[si].items.length).fill(null),
           started:Date.now(), flags:[] };
-  if(EXAM.shuffle){ const raw = BANKDATA.sets[si].items; att.qo = perm(raw.length); att.oo = raw.map(x => perm(x.o.length)); }
+  if(EXAM.mode === "cipher"){   // per paragraph: letter map, 3 peeks, and an extra random shift so every student's cipher differs
+    const n = BANKDATA.sets[si].items.length;
+    att.answers = Array.from({length:n}, () => ({}));
+    att.peeks = Array(n).fill(EXAM.peeks ?? 3);
+    att.cs = Array.from({length:n}, () => 1 + crypto.getRandomValues(new Uint32Array(1))[0] % 25);
+    if(EXAM.shuffle) att.qo = perm(n);
+  }
+  else if(EXAM.shuffle){ const raw = BANKDATA.sets[si].items; att.qo = perm(raw.length); att.oo = raw.map(x => perm(x.o.length)); }
   ls.set(K.active, att);
   buildView();
   enqueue(record("In progress"));
@@ -567,7 +606,9 @@ $("bCode").onclick = async () => {
 /* ---------- 4. ready ---------- */
 let VIEW = null;
 function buildView(){
-  const raw = BANKDATA.sets[att.setIndex].items, qo = att.qo || raw.map((_,i)=>i), oo = att.oo || raw.map(x=>x.o.map((_,j)=>j));
+  const raw = BANKDATA.sets[att.setIndex].items, qo = att.qo || raw.map((_,i)=>i);
+  if(isCipher()){ VIEW = qo.map(qi => ({...raw[qi], qi})); return; }
+  const oo = att.oo || raw.map(x=>x.o.map((_,j)=>j));
   VIEW = qo.map(qi => ({...raw[qi], qi, om:oo[qi], o:oo[qi].map(j => raw[qi].o[j])}));
 }
 function toReady(){
@@ -575,9 +616,10 @@ function toReady(){
   const R = EXAM.rules || [];
   $("readyRules").innerHTML = R.map(r => `<li>${esc(r)}</li>`).join(""); $("readyRules").classList.toggle("hidden", !R.length);
   const it = BANKDATA.sets[att.setIndex].items, P = EXAM.points;
-  const total = it.reduce((s,x)=>s+(P[x.type]||1),0);
+  const total = isCipher() ? it.reduce((s,x)=>s+x.c.replace(/[^A-Z]/g,"").length,0) : it.reduce((s,x)=>s+(P[x.type]||1),0);
   $("readyTitle").textContent = EXAM.title;
-  $("readyItems").textContent = `${it.length} items · ${total} points`;
+  $("readyItems").textContent = isCipher() ? `${it.length} paragraphs · ${total} letters (1 point each)` : `${it.length} items · ${total} points`;
+  $("bPractice").classList.toggle("hidden", isCipher());
   $("readyTime").textContent = att.expires ? `${fmtLeft(att.expires-Date.now())} (until ${fmtTime(new Date(att.expires))})` : "No limit";
   show("sReady");
 }
@@ -609,6 +651,9 @@ function tick(){
   if(left <= 0 && mode==="real" && !$("sExam").classList.contains("hidden")){ clearInterval(timerId); finish(true); }
 }
 function render(){
+  $("qCard").classList.toggle("hidden", isCipher() && mode==="real"); $("cCard").classList.toggle("hidden", !(isCipher() && mode==="real"));
+  $("gridLbl").textContent = isCipher() && mode==="real" ? "Paragraphs" : "Questions";
+  if(isCipher() && mode==="real") return renderCipher();
   const it = items(), A = answers(), q = it[cur], n = it.length;
   $("qNum").textContent = `Question ${cur+1} of ${n}`;
   $("qType").textContent = mode==="practice" ? "practice" : `${q.type} · ${EXAM.points[q.type]||1} pt${(EXAM.points[q.type]||1)>1?"s":""}`;
@@ -630,11 +675,11 @@ function render(){
 $("bPrev").onclick = () => { if(cur>0){ cur--; render(); } };
 $("bNext").onclick = () => { if(cur<items().length-1){ cur++; render(); coachEvent("next"); } else { $("bSubmit").scrollIntoView({behavior:"smooth"}); coachEvent("next"); } };
 $("bSubmit").onclick = () => {
-  const miss = answers().map((a,i)=>a===null?i+1:null).filter(Boolean);
+  const miss = isCipher() && mode==="real" ? cipherBlank() : answers().map((a,i)=>a===null?i+1:null).filter(Boolean);
   $("mTitle").textContent = "Submit now?";
   $("mBody").innerHTML = miss.length
-    ? `<p>You have <b style="color:var(--bad)">${miss.length} unanswered</b>: <b>${miss.join(", ")}</b>. These get 0 points.</p>`
-    : `<p>All questions are answered. ✅ You cannot change answers after this.</p>`;
+    ? (isCipher() && mode==="real" ? `<p>Paragraph${miss.length>1?"s":""} <b style="color:var(--bad)">${miss.join(", ")}</b> still ${miss.length>1?"have":"has"} blank letters. Blank letters get 0 points.</p>` : `<p>You have <b style="color:var(--bad)">${miss.length} unanswered</b>: <b>${miss.join(", ")}</b>. These get 0 points.</p>`)
+    : `<p>${isCipher() && mode==="real" ? "Every letter has an answer." : "All questions are answered."} ✅ You cannot change answers after this.</p>`;
   $("mYes").classList.remove("hidden"); $("mNo").textContent = "Go back";
   $("modal").classList.remove("hidden"); coachEvent("submit");
 };
@@ -654,6 +699,110 @@ addEventListener("blur", () => setTimeout(() => { if(!document.hidden) flag("los
 ["copy","cut","paste"].forEach(ev => document.addEventListener(ev, () => flag(ev)));
 document.addEventListener("contextmenu", () => flag("long-press/right-click"));
 addEventListener("pagehide", () => flag("closed app"));
+
+/* ---------- 5b. cipher exam (EXAM.mode "cipher") ---------- */
+const isCipher = () => !!(EXAM && EXAM.mode === "cipher");
+const AZ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const rot = (ch, k) => AZ[(AZ.indexOf(ch) + k + 26) % 26];
+const shown = v => v.c.replace(/[A-Z]/g, ch => rot(ch, att.cs[v.qi]));           // cipher text as this student sees it
+let peekUntil = 0, peekTimer = null;
+function cipherBlank(){   // paragraphs with letters still unassigned
+  return VIEW.map((v,i) => { const m = att.answers[v.qi], need = new Set(shown(v).replace(/[^A-Z]/g,"")); return [...need].every(c => m[c]) ? null : i+1; }).filter(Boolean);
+}
+function renderCipher(){
+  const v = VIEW[cur], n = VIEW.length, m = att.answers[v.qi], txt = shown(v);
+  $("cNum").textContent = `Paragraph ${cur+1} of ${n}`;
+  $("cInfo").textContent = `${txt.replace(/[^A-Z]/g,"").length} letters`;
+  $("cText").textContent = txt;
+  drawMap(); drawDecoded(); cipherNav();
+}
+function drawMap(){   // which cipher letters have an entry — never the letter that was entered (ballot style)
+  const v = VIEW[cur], m = att.answers[v.qi];
+  const letters = [...new Set(shown(v).replace(/[^A-Z]/g,""))].sort();
+  $("cMap").innerHTML = letters.map(c => `<span class="${m[c] ? "in" : ""}">${c}${m[c] ? "<small>✓</small>" : ""}</span>`).join("");
+}
+function cMsg(t, bad){ $("cMsg").textContent = t; $("cMsg").className = "cmsg" + (bad ? " bad" : ""); }
+function enterLetter(){
+  const v = VIEW[cur], m = att.answers[v.qi];
+  const c = $("cIn").value.toUpperCase().trim(), p = $("pIn").value.toUpperCase().trim();
+  if(!/^[A-Z]$/.test(c)) return cMsg("Type one cipher letter (A–Z).", true);
+  if(!/^[A-Z]$/.test(p)) return cMsg("Type one real letter (A–Z).", true);
+  if(!shown(v).includes(c)) return cMsg(`${c} is not in this paragraph.`, true);
+  const again = !!m[c]; m[c] = p; ls.set(K.active, att);
+  $("cIn").value = ""; $("pIn").value = ""; $("cIn").focus();
+  cMsg(again ? `Entry for ${c} changed.` : `Entry for ${c} saved.`);
+  drawMap(); drawDecoded(); cipherNav();
+}
+$("bEnter").onclick = enterLetter;
+$("cIn").addEventListener("input", () => { if($("cIn").value) $("pIn").focus(); });
+$("pIn").addEventListener("keydown", e => { if(e.key === "Enter") enterLetter(); });
+function drawDecoded(){
+  const v = VIEW[cur], m = att.answers[v.qi], peeking = Date.now() < peekUntil;
+  // while hidden, the real letters are not even on the page (only blurred placeholders)
+  $("cDecTxt").innerHTML = shown(v).split("").map(ch => !/[A-Z]/.test(ch) ? esc(ch) : peeking ? (m[ch] ? m[ch].toLowerCase() : `<span class="u">_</span>`) : (m[ch] ? "m" : `<span class="u">_</span>`)).join("");
+  $("cDec").classList.toggle("blur", !peeking);
+  const left = att.peeks[v.qi];
+  $("cPeekLeft").textContent = peeking ? `Peeking… ${Math.ceil((peekUntil-Date.now())/1000)} s` : `${left} peek${left===1?"":"s"} left for this paragraph`;
+  $("bPeek").disabled = peeking || left <= 0;
+}
+function cipherNav(){
+  const n = VIEW.length, blank = new Set(cipherBlank());
+  $("cPrev").disabled = cur===0;
+  $("cNext").textContent = cur===n-1 ? "Done ▶" : "Next ▶";
+  $("grid").innerHTML = VIEW.map((v,i)=>`<button class="${Object.keys(att.answers[v.qi]).length?"ans":""}${i===cur?" cur":""}" data-i="${i}">${i+1}</button>`).join("");
+  $("grid").querySelectorAll("button").forEach(b => b.onclick = () => { stopPeek(); cur=+b.dataset.i; render(); });
+  $("exProg").textContent = `Paragraphs complete: ${n - blank.size} of ${n}`;
+}
+function stopPeek(){ peekUntil = 0; clearInterval(peekTimer); }
+$("bPeek").onclick = () => {
+  const v = VIEW[cur]; if(att.peeks[v.qi] <= 0 || Date.now() < peekUntil) return;
+  att.peeks[v.qi]--; ls.set(K.active, att);
+  peekUntil = Date.now() + (EXAM.peekSeconds || 10) * 1000;
+  clearInterval(peekTimer); peekTimer = setInterval(() => { drawDecoded(); if(Date.now() >= peekUntil) stopPeek(); }, 250);
+  drawDecoded();
+};
+$("cPrev").onclick = () => { if(cur>0){ stopPeek(); cur--; render(); } };
+$("cNext").onclick = () => { stopPeek(); if(cur<VIEW.length-1){ cur++; render(); } else $("bSubmit").scrollIntoView({behavior:"smooth"}); };
+function cipherAnswers(){   // bank paragraph no., this student's extra shift, letters used, and their letter map (cipher→real)
+  if(!VIEW) return "";
+  return BANKDATA.sets[att.setIndex].items.map((_,qi) => {
+    const m = att.answers[qi] || {};
+    return `P${qi+1}[+${att.cs[qi]}, peeks used ${(EXAM.peeks ?? 3) - att.peeks[qi]}]: ` + Object.keys(m).sort().map(c => c + m[c].toLowerCase()).join(" ");
+  }).join(" | ");
+}
+async function finishCipher(auto){
+  stopPeek();
+  const it = BANKDATA.sets[att.setIndex].items, salt = BANKDATA.keySalt;
+  let score = 0, total = 0; const mk = [], key = [], ord = [];
+  for(const v of VIEW){
+    const m = att.answers[v.qi], ok = {}; let sc = 0, tot = 0;
+    for(const c of new Set(v.c.replace(/[^A-Z]/g,""))){        // c = bank cipher letter; student saw rot(c, extra shift)
+      const p = m[rot(c, att.cs[v.qi])];
+      ok[c] = !!p && (await sha(`${salt}|${att.setIndex}|${v.qi}|${c}|${p}`)) === v.h[c];
+    }
+    for(const ch of v.c) if(/[A-Z]/.test(ch)){ tot++; if(ok[ch]) sc++; }
+    // the shift this student had to undo (bank shift + extra shift), for checking answers later
+    let base = -1; const c0 = v.c.replace(/[^A-Z]/g,"")[0];
+    for(let k=0;k<26 && c0;k++) if((await sha(`${salt}|${att.setIndex}|${v.qi}|${c0}|${AZ[k]}`)) === v.h[c0]){ base = (AZ.indexOf(c0) - k + 26) % 26; break; }
+    score += sc; total += tot;
+    mk[v.qi] = `P${v.qi+1}:${sc}/${tot}`;
+    key[v.qi] = `P${v.qi+1}: shift ${base < 0 ? "?" : (base + att.cs[v.qi]) % 26}`;
+    ord.push(`P${v.qi+1}→#${ord.length+1}`);
+  }
+  att.ended = Date.now();
+  scoreCache = {score, total, percent:Math.round(score/total*1000)/10, marks:mk.join(" "), correct:key.join(" "), order:ord.join(" ")};
+  const rec = record(auto ? "Submitted (time up)" : "Submitted");
+  enqueue(rec);
+  const done = ls.get(K.done, {}); done[nkey(att.exam,att.name)] = {score, total, at:att.ended}; ls.set(K.done, done);
+  ls.del(K.active);
+  $("rScore").textContent = `${score} / ${total}`;
+  $("rName").textContent = att.name; $("rExam").textContent = att.examTitle; $("rSet").textContent = att.setName;
+  $("rDate").textContent = rec.date; $("rT1").textContent = rec.timeStarted; $("rT2").textContent = rec.timeEnded + (auto ? " (time up)" : "");
+  renderReview([]);
+  setUp(); show("sResult");
+  await syncNow(); setUp();
+  scoreCache = null;
+}
 
 /* ---------- 6. finish ---------- */
 function renderReview(rv){
@@ -682,7 +831,7 @@ function record(status){
     duration:t2?`${Math.floor((t2-t1)/60000)} min ${Math.round((t2-t1)/1000)%60} sec`:"",
     score:s.score ?? "", total:s.total ?? "", percent:s.percent ?? "",
     flags:att.flags.length, flagDetails:att.flags.join("; "),
-    answers:origAnswers().map((a,i)=>`${i+1}:${a===null?"-":"ABCD"[a]}`).join(" "), marks:s.marks || "", correct:s.correct || "", order:s.order || "" };
+    answers:isCipher() ? cipherAnswers() : origAnswers().map((a,i)=>`${i+1}:${a===null?"-":"ABCD"[a]}`).join(" "), marks:s.marks || "", correct:s.correct || "", order:s.order || "" };
 }
 function origAnswers(){   // answers in bank order (question no. and letter as stored in the bank)
   if(!VIEW) return att.answers.slice();
@@ -692,6 +841,7 @@ function origAnswers(){   // answers in bank order (question no. and letter as s
 }
 async function finish(auto){
   clearInterval(timerId); endCoach();
+  if(isCipher()) return finishCipher(auto);
   const it = BANKDATA.sets[att.setIndex].items, P = EXAM.points, salt = BANKDATA.keySalt;
   let score=0, total=0;
   // find the correct choice of every item (also recorded, so a student's wrong answers can be checked later)
