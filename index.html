@@ -103,7 +103,6 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .center input:focus{border-color:var(--pink);outline:none}.center .arr{font-size:1.5rem;color:var(--pink);padding-bottom:12px}
 .cmsg{min-height:1.4em;margin-top:6px;font-weight:600;font-size:.92rem;color:var(--pink-dark)}.cmsg.bad{color:var(--bad)}
 .cdec{position:relative;font:600 1.02rem/1.8 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em;word-break:break-word;border:2px dashed var(--line);border-radius:12px;padding:12px;margin:8px 0;min-height:80px;user-select:none;-webkit-user-select:none}
-.cdec.blur .txt{filter:blur(7px);opacity:.75}
 .cdec .u{color:var(--muted)}.cdec .s{color:var(--pink-dark);background:var(--pink-soft);border-radius:4px;font-weight:800}
 .ctiles{display:flex;flex-wrap:wrap;gap:8px;background:#cbd2db;border-radius:18px;padding:10px;margin:8px 0;width:fit-content;max-width:100%}
 .ctiles .tl{display:flex;flex-direction:column;gap:8px;width:46px}
@@ -115,8 +114,6 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .cdef{font-size:1.02rem;margin:4px 0 8px}
 .crow{display:flex;gap:8px}.crow input{flex:1;min-width:0;font:inherit;padding:12px 14px;border:2px solid var(--line);border-radius:14px;text-transform:uppercase;letter-spacing:.08em}.crow input::placeholder{text-transform:none;letter-spacing:0}.crow button{flex:0 0 auto}
 .cmsg.ok{color:var(--ok)}
-.cpeek{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:6px}
-.cpeek .left{font-weight:700;color:var(--pink-dark)}
 .grid button{padding:0;min-height:42px;background:#fff;border:2px solid var(--line);color:var(--ink)}
 .grid button.ans{background:var(--btn);border-color:var(--btn2);color:var(--btn-ink)}
 .grid button.cur{outline:3px solid var(--pink-dark);outline-offset:2px}
@@ -264,9 +261,7 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
     </div>
     <div id="cWork">
       <div class="cstep" style="margin-top:14px">Paragraph</div>
-      <div class="muted">Encrypted paragraph (blurred — a peek shows it with your letters filled in):</div>
-      <div id="cDec" class="cdec blur"><span class="txt" id="cDecTxt"></span></div>
-      <div class="cpeek"><span class="left" id="cPeekLeft"></span><button id="bPeek" class="btn2">👁 Peek</button></div>
+      <div id="cDec" class="cdec"><span class="txt" id="cDecTxt"></span></div>
       <div class="center">
         <div><label for="cIn">Cipher letter</label><input id="cIn" maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false"></div>
         <div class="arr">→</div>
@@ -600,10 +595,11 @@ $("bCode").onclick = async () => {
   att = { id:uid(), exam:EXAM.id, examTitle:EXAM.title, name:NAME, code:u.label, online, expires,
           setIndex:si, setName:BANKDATA.sets[si].name, answers:Array(BANKDATA.sets[si].items.length).fill(null),
           started:Date.now(), flags:[] };
-  if(EXAM.mode === "cipher"){   // per paragraph: letter map, 3 peeks, and an extra random shift so every student's cipher differs
+  if(EXAM.mode === "cipher"){   // per paragraph: letter map, a clue word, and an extra random shift so every student's cipher differs
     const n = BANKDATA.sets[si].items.length;
     att.answers = Array.from({length:n}, () => ({}));
-    att.peeks = Array(n).fill(EXAM.peeks ?? 3);
+    const pick = perm((BANKDATA.clues || []).length);   // a different clue word per paragraph, from the activity's word list
+    att.clueIdx = Array.from({length:n}, (_,i) => pick[i % Math.max(1, pick.length)]);
     const rnd25 = () => 1 + crypto.getRandomValues(new Uint32Array(1))[0] % 25;
     att.cs = BANKDATA.sets[si].items.map(x => { let k = rnd25(); while(k === x.nz) k = rnd25(); return k; });   // nz: extra shift that would cancel the cipher (total shift 0)
     if(EXAM.shuffle) att.qo = perm(n);
@@ -718,7 +714,6 @@ const isCipher = () => !!(EXAM && EXAM.mode === "cipher");
 const AZ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const rot = (ch, k) => AZ[(AZ.indexOf(ch) + k + 26) % 26];
 const shown = v => v.c.replace(/[A-Z]/g, ch => rot(ch, att.cs[v.qi]));           // cipher text as this student sees it
-let peekUntil = 0, peekTimer = null;
 function cipherBlank(){   // paragraphs with no letters entered (says nothing about correctness)
   return VIEW.map((v,i) => Object.keys(att.answers[v.qi]).length ? null : i+1).filter(Boolean);
 }
@@ -727,7 +722,7 @@ function renderCipher(){
   $("cNum").textContent = `Paragraph ${cur+1} of ${n}`;
   $("cInfo").textContent = "Caesar cipher";
   // clue: encrypted word in tiles with a box under each letter (for the student's own notes — never checked)
-  const word = v.cw.replace(/[A-Z]/g, ch => rot(ch, att.cs[v.qi]));
+  const clue = BANKDATA.clues[att.clueIdx[v.qi]], word = clue[0].replace(/[A-Z]/g, ch => rot(ch, ((26 - v.nz) % 26) + att.cs[v.qi]));
   att.clueIn = att.clueIn || {}; const notes = att.clueIn[v.qi] || [];
   $("cClueTiles").innerHTML = word.split("").map((ch, k) => `<div class="tl"><b>${ch}</b><input maxlength="1" data-k="${k}" value="${esc(notes[k] || "")}" autocomplete="off" autocapitalize="characters" spellcheck="false"></div>`).join("");
   $("cClueTiles").querySelectorAll("input").forEach((inp, k, all) => inp.oninput = () => {
@@ -735,7 +730,7 @@ function renderCipher(){
     const a = att.clueIn[v.qi] = att.clueIn[v.qi] || []; a[k] = inp.value; ls.set(K.active, att);
     if(inp.value && all[k+1]) all[k+1].focus();
   });
-  $("cClueDef").textContent = v.cd;
+  $("cClueDef").textContent = clue[1];
   $("cMsg").textContent = "";
   drawCipher(); cipherNav();
 }
@@ -752,42 +747,26 @@ function enterLetter(){   // ballot style: the entry is saved and never shown ag
 $("bEnter").onclick = enterLetter;
 $("cIn").addEventListener("input", () => { if($("cIn").value) $("pIn").focus(); });
 $("pIn").addEventListener("keydown", e => { if(e.key === "Enter") enterLetter(); });
-function drawCipher(){   // the encrypted paragraph is blurred; while blurred its letters are not on the page at all
-  const v = VIEW[cur], peeking = Date.now() < peekUntil;
-  const m = att.answers[v.qi];   // while peeking: entered letters replace their cipher letters (pink lowercase); others stay as cipher
-  $("cDecTxt").innerHTML = peeking ? shown(v).split("").map(ch => /[A-Z]/.test(ch) && m[ch] ? `<span class="s">${m[ch].toLowerCase()}</span>` : esc(ch)).join("") : esc(shown(v).replace(/[A-Z]/g, "M"));
-  $("cDec").classList.toggle("blur", !peeking);
-  const left = att.peeks[v.qi];
-  $("cPeekLeft").textContent = peeking ? `Peeking… ${Math.ceil((peekUntil-Date.now())/1000)} s` : `${left} peek${left===1?"":"s"} left for this paragraph`;
-  $("bPeek").disabled = peeking || left <= 0;
-}
+function drawCipher(){ $("cDecTxt").textContent = shown(VIEW[cur]); }
 function cipherNav(){
   const n = VIEW.length, blank = new Set(cipherBlank());
   $("cPrev").disabled = cur===0;
   $("cNext").textContent = cur===n-1 ? "Done ▶" : "Next ▶";
   $("grid").innerHTML = VIEW.map((v,i)=>`<button class="${Object.keys(att.answers[v.qi]).length?"ans":""}${i===cur?" cur":""}" data-i="${i}">${i+1}</button>`).join("");
-  $("grid").querySelectorAll("button").forEach(b => b.onclick = () => { stopPeek(); cur=+b.dataset.i; render(); });
+  $("grid").querySelectorAll("button").forEach(b => b.onclick = () => { cur=+b.dataset.i; render(); });
   $("exProg").textContent = `Paragraphs started: ${n - blank.size} of ${n}`;
 }
-function stopPeek(){ peekUntil = 0; clearInterval(peekTimer); }
-$("bPeek").onclick = () => {
-  const v = VIEW[cur]; if(att.peeks[v.qi] <= 0 || Date.now() < peekUntil) return;
-  att.peeks[v.qi]--; ls.set(K.active, att);
-  peekUntil = Date.now() + (EXAM.peekSeconds || 10) * 1000;
-  clearInterval(peekTimer); peekTimer = setInterval(() => { drawCipher(); if(Date.now() >= peekUntil){ stopPeek(); drawCipher(); } }, 250);
-  drawCipher();
-};
-$("cPrev").onclick = () => { if(cur>0){ stopPeek(); cur--; render(); } };
-$("cNext").onclick = () => { stopPeek(); if(cur<VIEW.length-1){ cur++; render(); } else $("bSubmit").scrollIntoView({behavior:"smooth"}); };
+$("cPrev").onclick = () => { if(cur>0){ cur--; render(); } };
+$("cNext").onclick = () => { if(cur<VIEW.length-1){ cur++; render(); } else $("bSubmit").scrollIntoView({behavior:"smooth"}); };
 function cipherAnswers(){   // bank paragraph no., this student's extra shift, letters used, and their letter map (cipher→real)
   if(!VIEW) return "";
   return BANKDATA.sets[att.setIndex].items.map((_,qi) => {
     const m = att.answers[qi] || {};
-    return `P${qi+1}[+${att.cs[qi]}, clue "${((att.clueIn||{})[qi]||[]).map(x=>x||"_").join("")}", peeks used ${(EXAM.peeks ?? 3) - att.peeks[qi]}]: ` + Object.keys(m).sort().map(c => c + m[c].toLowerCase()).join(" ");
+    return `P${qi+1}[+${att.cs[qi]}, clue ${BANKDATA.clues[att.clueIdx[qi]][0]} "${((att.clueIn||{})[qi]||[]).map(x=>x||"_").join("")}"]: ` + Object.keys(m).sort().map(c => c + m[c].toLowerCase()).join(" ");
   }).join(" | ");
 }
 async function finishCipher(auto){
-  stopPeek();
+  
   const it = BANKDATA.sets[att.setIndex].items, salt = BANKDATA.keySalt;
   let score = 0, total = 0; const mk = [], key = [], ord = [];
   for(const v of VIEW){
