@@ -104,7 +104,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .cmsg{min-height:1.4em;margin-top:6px;font-weight:600;font-size:.92rem;color:var(--pink-dark)}.cmsg.bad{color:var(--bad)}
 .cdec{position:relative;font:600 1.02rem/1.8 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em;word-break:break-word;border:2px dashed var(--line);border-radius:12px;padding:12px;margin:8px 0;min-height:80px;user-select:none;-webkit-user-select:none}
 .cdec.blur .txt{filter:blur(7px);opacity:.75}
-.cdec .u{color:var(--muted)}
+.cdec .u{color:var(--muted)}.cdec .s{color:var(--pink-dark);background:var(--pink-soft);border-radius:4px;font-weight:800}
 .cstep{font-size:.8rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);margin:10px 0 4px}
 .ccw{font:700 1.45rem/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.18em;color:var(--pink-dark);background:var(--pink-soft);border-radius:14px;padding:12px;text-align:center;word-break:break-all;margin:8px 0}
 .cdef{font-size:1.02rem;margin:4px 0 8px}
@@ -262,7 +262,7 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
     </div>
     <div id="cWork" class="hidden">
       <div class="cstep" style="margin-top:14px">Paragraph</div>
-      <div class="muted">Encrypted paragraph (blurred — use a peek to see it):</div>
+      <div class="muted">Encrypted paragraph (blurred — a peek shows it with your letters filled in):</div>
       <div id="cDec" class="cdec blur"><span class="txt" id="cDecTxt"></span></div>
       <div class="cpeek"><span class="left" id="cPeekLeft"></span><button id="bPeek" class="btn2">👁 Peek</button></div>
       <div class="center">
@@ -758,7 +758,8 @@ $("cIn").addEventListener("input", () => { if($("cIn").value) $("pIn").focus(); 
 $("pIn").addEventListener("keydown", e => { if(e.key === "Enter") enterLetter(); });
 function drawCipher(){   // the encrypted paragraph is blurred; while blurred its letters are not on the page at all
   const v = VIEW[cur], peeking = Date.now() < peekUntil;
-  $("cDecTxt").textContent = peeking ? shown(v) : shown(v).replace(/[A-Z]/g, "M");
+  const m = att.answers[v.qi];   // while peeking: entered letters replace their cipher letters (pink lowercase); others stay as cipher
+  $("cDecTxt").innerHTML = peeking ? shown(v).split("").map(ch => /[A-Z]/.test(ch) && m[ch] ? `<span class="s">${m[ch].toLowerCase()}</span>` : esc(ch)).join("") : esc(shown(v).replace(/[A-Z]/g, "M"));
   $("cDec").classList.toggle("blur", !peeking);
   const left = att.peeks[v.qi];
   $("cPeekLeft").textContent = peeking ? `Peeking… ${Math.ceil((peekUntil-Date.now())/1000)} s` : `${left} peek${left===1?"":"s"} left for this paragraph`;
