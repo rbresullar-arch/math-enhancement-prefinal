@@ -138,7 +138,7 @@ const EXAMS = [
     id: "mmw-cipher-exam",
     subject: "mmw",
     mode: "cipher",
-    title: "Math in the Modern World — Cryptography Examination",
+    title: "Math in the Modern World — Final Examination",
     topic: "Coding Theory and Cryptography · Caesar cipher · decode 5 paragraphs",
     info: "5 paragraphs · 1 point per correct letter · 60 minutes",
     bank: "exams/mmw-cipher-exam.enc.js",
@@ -176,7 +176,7 @@ const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
-  { v: "2.9", date: "2026-11-10", notes: ["Math in the Modern World — Cryptography Examination: decode 5 Caesar-cipher paragraphs, 3 peeks each, scored by correct letters."] },
+  { v: "2.9", date: "2026-11-10", notes: ["Math in the Modern World — Final Examination (cryptography): decode 5 Caesar-cipher paragraphs, 3 peeks each, scored by correct letters."] },
   { v: "2.8", date: "2026-11-09", notes: ["Set Theory exam renamed to “Discrete Mathematics — Midterm Examination”."] },
   { v: "2.7", date: "2026-11-09", notes: ["Discrete Mathematics — Set Theory Examination (50 items, Sets A–C).", "Items can show shared “given” information and Python code above the question."] },
   { v: "2.6", date: "2026-11-09", notes: ["New subject: Discrete Mathematics.", "Discrete Mathematics — Prefinal Examination (Functions, 30 items, Sets A–C)."] },
