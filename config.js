@@ -149,7 +149,7 @@ const EXAMS = [
     points: { "Cipher": 1 },
     rules: [
       "Each paragraph is encrypted with a Caesar cipher. Every paragraph has its own shift.",
-      "Each paragraph starts with an encrypted clue word and its definition. Solve the clue to open the paragraph.",
+      "Each paragraph has an encrypted clue word with its definition. Use it to find the shift; the boxes under the clue are for your own notes (not checked).",
       "The encrypted paragraph is blurred. You have 3 peeks per paragraph; a peek shows it for 10 seconds with your entered letters filled in.",
       "Enter your answer one letter at a time (cipher letter → real letter). Entries are hidden after you enter them.",
       "You will not be told whether a paragraph is solved. Your score is the number of correct letters.",
@@ -177,6 +177,7 @@ const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
+  { v: "3.4", date: "2026-11-10", notes: ["Math in the Modern World — Final Examination: clue shown as letter tiles with note boxes; no correct/incorrect check; paragraphs always open."] },
   { v: "3.3", date: "2026-11-10", notes: ["Math in the Modern World — Final Examination: a peek shows the paragraph with your entered letters filled in."] },
   { v: "3.2", date: "2026-11-10", notes: ["Math in the Modern World — Final Examination: a paragraph can never end up with a shift of 0 (unencrypted)."] },
   { v: "3.1", date: "2026-11-10", notes: ["Math in the Modern World — Final Examination: new clue definitions; no instructions on the clue."] },

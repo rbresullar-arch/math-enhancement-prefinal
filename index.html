@@ -105,6 +105,11 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .cdec{position:relative;font:600 1.02rem/1.8 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em;word-break:break-word;border:2px dashed var(--line);border-radius:12px;padding:12px;margin:8px 0;min-height:80px;user-select:none;-webkit-user-select:none}
 .cdec.blur .txt{filter:blur(7px);opacity:.75}
 .cdec .u{color:var(--muted)}.cdec .s{color:var(--pink-dark);background:var(--pink-soft);border-radius:4px;font-weight:800}
+.ctiles{display:flex;flex-wrap:wrap;gap:8px;background:#cbd2db;border-radius:18px;padding:10px;margin:8px 0;width:fit-content;max-width:100%}
+.ctiles .tl{display:flex;flex-direction:column;gap:8px;width:46px}
+.ctiles .tl b{display:grid;place-items:center;height:46px;background:#fff;border-radius:12px;font:800 1.6rem system-ui,sans-serif;color:#111}
+.ctiles .tl input{width:46px;height:46px;padding:0;border:0;border-radius:12px;background:#fff;text-align:center;font:800 1.4rem system-ui,sans-serif;text-transform:uppercase;color:var(--pink-dark)}
+.ctiles .tl input:focus{outline:3px solid var(--pink)}
 .cstep{font-size:.8rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);margin:10px 0 4px}
 .ccw{font:700 1.45rem/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.18em;color:var(--pink-dark);background:var(--pink-soft);border-radius:14px;padding:12px;text-align:center;word-break:break-all;margin:8px 0}
 .cdef{font-size:1.02rem;margin:4px 0 8px}
@@ -254,13 +259,10 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
     <div class="bar"><b id="cNum"></b><span class="qtype" id="cInfo"></span></div>
     <div id="cClue">
       <div class="cstep">Clue</div>
-      <div id="cClueWord" class="ccw"></div>
+      <div id="cClueTiles" class="ctiles"></div>
       <div id="cClueDef" class="cdef"></div>
-      <div id="cClueAsk"><div class="crow"><input id="cClueIn" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Type the word"><button id="bClue" class="btn">Check</button></div>
-      <div id="cClueRes" class="cmsg"></div></div>
-      <div id="cClueOk" class="cmsg hidden"></div>
     </div>
-    <div id="cWork" class="hidden">
+    <div id="cWork">
       <div class="cstep" style="margin-top:14px">Paragraph</div>
       <div class="muted">Encrypted paragraph (blurred — a peek shows it with your letters filled in):</div>
       <div id="cDec" class="cdec blur"><span class="txt" id="cDecTxt"></span></div>
@@ -721,28 +723,22 @@ function cipherBlank(){   // paragraphs with no letters entered (says nothing ab
   return VIEW.map((v,i) => Object.keys(att.answers[v.qi]).length ? null : i+1).filter(Boolean);
 }
 function renderCipher(){
-  const v = VIEW[cur], n = VIEW.length, solved = !!(att.clue && att.clue[v.qi]);
+  const v = VIEW[cur], n = VIEW.length;
   $("cNum").textContent = `Paragraph ${cur+1} of ${n}`;
   $("cInfo").textContent = "Caesar cipher";
-  $("cClueWord").textContent = v.cw.replace(/[A-Z]/g, ch => rot(ch, att.cs[v.qi]));
+  // clue: encrypted word in tiles with a box under each letter (for the student's own notes — never checked)
+  const word = v.cw.replace(/[A-Z]/g, ch => rot(ch, att.cs[v.qi]));
+  att.clueIn = att.clueIn || {}; const notes = att.clueIn[v.qi] || [];
+  $("cClueTiles").innerHTML = word.split("").map((ch, k) => `<div class="tl"><b>${ch}</b><input maxlength="1" data-k="${k}" value="${esc(notes[k] || "")}" autocomplete="off" autocapitalize="characters" spellcheck="false"></div>`).join("");
+  $("cClueTiles").querySelectorAll("input").forEach((inp, k, all) => inp.oninput = () => {
+    inp.value = inp.value.toUpperCase().replace(/[^A-Z]/g,"").slice(-1);
+    const a = att.clueIn[v.qi] = att.clueIn[v.qi] || []; a[k] = inp.value; ls.set(K.active, att);
+    if(inp.value && all[k+1]) all[k+1].focus();
+  });
   $("cClueDef").textContent = v.cd;
-  $("cClueAsk").classList.toggle("hidden", solved); $("cClueOk").classList.toggle("hidden", !solved);
-  if(solved){ $("cClueOk").className = "cmsg ok"; $("cClueOk").textContent = `Clue solved: ${att.clue[v.qi]} ✓`; }
-  $("cClueIn").value = ""; $("cClueRes").textContent = "";
-  $("cWork").classList.toggle("hidden", !solved);
   $("cMsg").textContent = "";
   drawCipher(); cipherNav();
 }
-async function checkClue(){
-  const v = VIEW[cur], g = $("cClueIn").value.toUpperCase().replace(/[^A-Z]/g,"");
-  if(!g) return cMsg2("Type the word.", true);
-  const ok = (await sha(`${BANKDATA.keySalt}|${att.setIndex}|${v.qi}|clue|${g}`)) === v.hc;
-  if(!ok) return cMsg2("Not correct — try again.", true);
-  att.clue = att.clue || {}; att.clue[v.qi] = g; ls.set(K.active, att); renderCipher();
-}
-function cMsg2(t, bad){ $("cClueRes").textContent = t; $("cClueRes").className = "cmsg" + (bad ? " bad" : ""); }
-$("bClue").onclick = checkClue;
-$("cClueIn").addEventListener("keydown", e => { if(e.key === "Enter") checkClue(); });
 function cMsg(t, bad){ $("cMsg").textContent = t; $("cMsg").className = "cmsg" + (bad ? " bad" : ""); }
 function enterLetter(){   // ballot style: the entry is saved and never shown again
   const v = VIEW[cur], m = att.answers[v.qi];
@@ -787,7 +783,7 @@ function cipherAnswers(){   // bank paragraph no., this student's extra shift, l
   if(!VIEW) return "";
   return BANKDATA.sets[att.setIndex].items.map((_,qi) => {
     const m = att.answers[qi] || {};
-    return `P${qi+1}[+${att.cs[qi]}, clue ${att.clue && att.clue[qi] ? "solved" : "not solved"}, peeks used ${(EXAM.peeks ?? 3) - att.peeks[qi]}]: ` + Object.keys(m).sort().map(c => c + m[c].toLowerCase()).join(" ");
+    return `P${qi+1}[+${att.cs[qi]}, clue "${((att.clueIn||{})[qi]||[]).map(x=>x||"_").join("")}", peeks used ${(EXAM.peeks ?? 3) - att.peeks[qi]}]: ` + Object.keys(m).sort().map(c => c + m[c].toLowerCase()).join(" ");
   }).join(" | ");
 }
 async function finishCipher(auto){
