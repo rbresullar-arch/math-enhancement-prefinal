@@ -718,6 +718,7 @@ function cipherBlank(){   // paragraphs with no letters entered (says nothing ab
   return VIEW.map((v,i) => Object.keys(att.answers[v.qi]).length ? null : i+1).filter(Boolean);
 }
 function renderCipher(){
+  if(!att.clueIdx){ const pick = perm((BANKDATA.clues || []).length); att.clueIdx = VIEW.map((_,i) => pick[i % Math.max(1, pick.length)]); ls.set(K.active, att); }   // attempts started before v3.5
   const v = VIEW[cur], n = VIEW.length;
   $("cNum").textContent = `Paragraph ${cur+1} of ${n}`;
   $("cInfo").textContent = "Caesar cipher";

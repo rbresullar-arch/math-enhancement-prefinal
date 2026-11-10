@@ -174,6 +174,7 @@ const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
+  { v: "3.6", date: "2026-11-10", notes: ["Math in the Modern World — Final Examination: attempts started on an older version open correctly."] },
   { v: "3.5", date: "2026-11-10", notes: ["Math in the Modern World — Final Examination: no blur or peeks; clue words now come from the Cipher Decoder activity, a different one per paragraph."] },
   { v: "3.4", date: "2026-11-10", notes: ["Math in the Modern World — Final Examination: clue shown as letter tiles with note boxes; no correct/incorrect check; paragraphs always open."] },
   { v: "3.3", date: "2026-11-10", notes: ["Math in the Modern World — Final Examination: a peek shows the paragraph with your entered letters filled in."] },
