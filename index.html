@@ -98,9 +98,6 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:8px}
 /* cipher exam */
 .ctext{font:600 1.02rem/1.8 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;word-break:break-word;background:var(--pink-soft);border-radius:12px;padding:12px;margin:8px 0}
-.cmap{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px;margin:10px 0}
-.cmap span{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:44px;border:2px solid var(--line);border-radius:10px;font:800 1rem ui-monospace,Menlo,monospace;color:var(--pink-dark);background:#fff;line-height:1.1}
-.cmap span.in{background:var(--pink-soft);border-color:var(--btn2)}.cmap span small{font:700 .7rem system-ui;color:var(--pink-dark)}
 .center{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end;margin-top:10px}.center label{font-size:.85rem;margin:0 0 4px}
 .center input{width:100%;text-align:center;font:800 1.6rem ui-monospace,Menlo,monospace;text-transform:uppercase;padding:8px;border:2px solid var(--line);border-radius:14px}
 .center input:focus{border-color:var(--pink);outline:none}.center .arr{font-size:1.5rem;color:var(--pink);padding-bottom:12px}
@@ -108,6 +105,11 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .cdec{position:relative;font:600 1.02rem/1.8 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em;word-break:break-word;border:2px dashed var(--line);border-radius:12px;padding:12px;margin:8px 0;min-height:80px;user-select:none;-webkit-user-select:none}
 .cdec.blur .txt{filter:blur(7px);opacity:.75}
 .cdec .u{color:var(--muted)}
+.cstep{font-size:.8rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);margin:10px 0 4px}
+.ccw{font:700 1.45rem/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.18em;color:var(--pink-dark);background:var(--pink-soft);border-radius:14px;padding:12px;text-align:center;word-break:break-all;margin:8px 0}
+.cdef{font-size:1.02rem;margin:4px 0 8px}
+.crow{display:flex;gap:8px}.crow input{flex:1;min-width:0;font:inherit;padding:12px 14px;border:2px solid var(--line);border-radius:14px;text-transform:uppercase;letter-spacing:.08em}.crow input::placeholder{text-transform:none;letter-spacing:0}.crow button{flex:0 0 auto}
+.cmsg.ok{color:var(--ok)}
 .cpeek{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:6px}
 .cpeek .left{font-weight:700;color:var(--pink-dark)}
 .grid button{padding:0;min-height:42px;background:#fff;border:2px solid var(--line);color:var(--ink)}
@@ -250,20 +252,29 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
   </div>
   <div id="cCard" class="card hidden">
     <div class="bar"><b id="cNum"></b><span class="qtype" id="cInfo"></span></div>
-    <div class="muted" style="margin-top:6px">Encrypted paragraph (Caesar cipher):</div>
-    <div id="cText" class="ctext"></div>
-    <div class="center">
-      <div><label for="cIn">Cipher letter</label><input id="cIn" maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false"></div>
-      <div class="arr">→</div>
-      <div><label for="pIn">Real letter</label><input id="pIn" maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false"></div>
+    <div id="cClue">
+      <div class="cstep">Step 1 · Clue word</div>
+      <p class="muted">This encrypted word uses the same shift as the paragraph. Read the definition, type the real word, and tap Check. The paragraph opens when the clue is correct.</p>
+      <div id="cClueWord" class="ccw"></div>
+      <div id="cClueDef" class="cdef"></div>
+      <div id="cClueAsk"><div class="crow"><input id="cClueIn" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Type the word"><button id="bClue" class="btn">Check</button></div>
+      <div id="cClueRes" class="cmsg"></div></div>
+      <div id="cClueOk" class="cmsg hidden"></div>
     </div>
-    <button id="bEnter" class="btn full" style="margin-top:10px">Enter letter</button>
-    <div id="cMsg" class="cmsg"></div>
-    <div class="muted" style="margin-top:8px">Cipher letters in this paragraph (✓ = you entered a letter; you can enter it again to change it):</div>
-    <div id="cMap" class="cmap"></div>
-    <div class="muted">Your decoded paragraph (hidden — use a peek to check it):</div>
-    <div id="cDec" class="cdec blur"><span class="txt" id="cDecTxt"></span></div>
-    <div class="cpeek"><span class="left" id="cPeekLeft"></span><button id="bPeek" class="btn2">👁 Peek</button></div>
+    <div id="cWork" class="hidden">
+      <div class="cstep" style="margin-top:14px">Step 2 · Decode the paragraph</div>
+      <div class="muted">Encrypted paragraph (blurred — use a peek to see it):</div>
+      <div id="cDec" class="cdec blur"><span class="txt" id="cDecTxt"></span></div>
+      <div class="cpeek"><span class="left" id="cPeekLeft"></span><button id="bPeek" class="btn2">👁 Peek</button></div>
+      <div class="center">
+        <div><label for="cIn">Cipher letter</label><input id="cIn" maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false"></div>
+        <div class="arr">→</div>
+        <div><label for="pIn">Real letter</label><input id="pIn" maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false"></div>
+      </div>
+      <button id="bEnter" class="btn full" style="margin-top:10px">Enter letter</button>
+      <div id="cMsg" class="cmsg"></div>
+      <p class="muted">Entries are hidden after you enter them. To change one, enter the same cipher letter again.</p>
+    </div>
     <div class="nav"><button id="cPrev" class="btn2">◀ Back</button><button id="cNext" class="btn">Next ▶</button></div>
   </div>
   <div id="gridCard" class="card">
@@ -678,8 +689,8 @@ $("bSubmit").onclick = () => {
   const miss = isCipher() && mode==="real" ? cipherBlank() : answers().map((a,i)=>a===null?i+1:null).filter(Boolean);
   $("mTitle").textContent = "Submit now?";
   $("mBody").innerHTML = miss.length
-    ? (isCipher() && mode==="real" ? `<p>Paragraph${miss.length>1?"s":""} <b style="color:var(--bad)">${miss.join(", ")}</b> still ${miss.length>1?"have":"has"} blank letters. Blank letters get 0 points.</p>` : `<p>You have <b style="color:var(--bad)">${miss.length} unanswered</b>: <b>${miss.join(", ")}</b>. These get 0 points.</p>`)
-    : `<p>${isCipher() && mode==="real" ? "Every letter has an answer." : "All questions are answered."} ✅ You cannot change answers after this.</p>`;
+    ? (isCipher() && mode==="real" ? `<p>You have not entered any letters for paragraph${miss.length>1?"s":""} <b style="color:var(--bad)">${miss.join(", ")}</b>. These get 0 points.</p>` : `<p>You have <b style="color:var(--bad)">${miss.length} unanswered</b>: <b>${miss.join(", ")}</b>. These get 0 points.</p>`)
+    : `<p>${isCipher() && mode==="real" ? "Every paragraph has entries." : "All questions are answered."} ✅ You cannot change answers after this.</p>`;
   $("mYes").classList.remove("hidden"); $("mNo").textContent = "Go back";
   $("modal").classList.remove("hidden"); coachEvent("submit");
 };
@@ -706,40 +717,48 @@ const AZ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const rot = (ch, k) => AZ[(AZ.indexOf(ch) + k + 26) % 26];
 const shown = v => v.c.replace(/[A-Z]/g, ch => rot(ch, att.cs[v.qi]));           // cipher text as this student sees it
 let peekUntil = 0, peekTimer = null;
-function cipherBlank(){   // paragraphs with letters still unassigned
-  return VIEW.map((v,i) => { const m = att.answers[v.qi], need = new Set(shown(v).replace(/[^A-Z]/g,"")); return [...need].every(c => m[c]) ? null : i+1; }).filter(Boolean);
+function cipherBlank(){   // paragraphs with no letters entered (says nothing about correctness)
+  return VIEW.map((v,i) => Object.keys(att.answers[v.qi]).length ? null : i+1).filter(Boolean);
 }
 function renderCipher(){
-  const v = VIEW[cur], n = VIEW.length, m = att.answers[v.qi], txt = shown(v);
+  const v = VIEW[cur], n = VIEW.length, solved = !!(att.clue && att.clue[v.qi]);
   $("cNum").textContent = `Paragraph ${cur+1} of ${n}`;
-  $("cInfo").textContent = `${txt.replace(/[^A-Z]/g,"").length} letters`;
-  $("cText").textContent = txt;
-  drawMap(); drawDecoded(); cipherNav();
+  $("cInfo").textContent = "Caesar cipher";
+  $("cClueWord").textContent = v.cw.replace(/[A-Z]/g, ch => rot(ch, att.cs[v.qi]));
+  $("cClueDef").textContent = v.cd;
+  $("cClueAsk").classList.toggle("hidden", solved); $("cClueOk").classList.toggle("hidden", !solved);
+  if(solved){ $("cClueOk").className = "cmsg ok"; $("cClueOk").textContent = `Clue solved: ${att.clue[v.qi]} ✓`; }
+  $("cClueIn").value = ""; $("cClueRes").textContent = "";
+  $("cWork").classList.toggle("hidden", !solved);
+  $("cMsg").textContent = "";
+  drawCipher(); cipherNav();
 }
-function drawMap(){   // which cipher letters have an entry — never the letter that was entered (ballot style)
-  const v = VIEW[cur], m = att.answers[v.qi];
-  const letters = [...new Set(shown(v).replace(/[^A-Z]/g,""))].sort();
-  $("cMap").innerHTML = letters.map(c => `<span class="${m[c] ? "in" : ""}">${c}${m[c] ? "<small>✓</small>" : ""}</span>`).join("");
+async function checkClue(){
+  const v = VIEW[cur], g = $("cClueIn").value.toUpperCase().replace(/[^A-Z]/g,"");
+  if(!g) return cMsg2("Type the word.", true);
+  const ok = (await sha(`${BANKDATA.keySalt}|${att.setIndex}|${v.qi}|clue|${g}`)) === v.hc;
+  if(!ok) return cMsg2("Not correct — try again.", true);
+  att.clue = att.clue || {}; att.clue[v.qi] = g; ls.set(K.active, att); renderCipher();
 }
+function cMsg2(t, bad){ $("cClueRes").textContent = t; $("cClueRes").className = "cmsg" + (bad ? " bad" : ""); }
+$("bClue").onclick = checkClue;
+$("cClueIn").addEventListener("keydown", e => { if(e.key === "Enter") checkClue(); });
 function cMsg(t, bad){ $("cMsg").textContent = t; $("cMsg").className = "cmsg" + (bad ? " bad" : ""); }
-function enterLetter(){
+function enterLetter(){   // ballot style: the entry is saved and never shown again
   const v = VIEW[cur], m = att.answers[v.qi];
   const c = $("cIn").value.toUpperCase().trim(), p = $("pIn").value.toUpperCase().trim();
   if(!/^[A-Z]$/.test(c)) return cMsg("Type one cipher letter (A–Z).", true);
   if(!/^[A-Z]$/.test(p)) return cMsg("Type one real letter (A–Z).", true);
-  if(!shown(v).includes(c)) return cMsg(`${c} is not in this paragraph.`, true);
-  const again = !!m[c]; m[c] = p; ls.set(K.active, att);
+  m[c] = p; ls.set(K.active, att);
   $("cIn").value = ""; $("pIn").value = ""; $("cIn").focus();
-  cMsg(again ? `Entry for ${c} changed.` : `Entry for ${c} saved.`);
-  drawMap(); drawDecoded(); cipherNav();
+  cMsg("Entry saved."); cipherNav();
 }
 $("bEnter").onclick = enterLetter;
 $("cIn").addEventListener("input", () => { if($("cIn").value) $("pIn").focus(); });
 $("pIn").addEventListener("keydown", e => { if(e.key === "Enter") enterLetter(); });
-function drawDecoded(){
-  const v = VIEW[cur], m = att.answers[v.qi], peeking = Date.now() < peekUntil;
-  // while hidden, the real letters are not even on the page (only blurred placeholders)
-  $("cDecTxt").innerHTML = shown(v).split("").map(ch => !/[A-Z]/.test(ch) ? esc(ch) : peeking ? (m[ch] ? m[ch].toLowerCase() : `<span class="u">_</span>`) : (m[ch] ? "m" : `<span class="u">_</span>`)).join("");
+function drawCipher(){   // the encrypted paragraph is blurred; while blurred its letters are not on the page at all
+  const v = VIEW[cur], peeking = Date.now() < peekUntil;
+  $("cDecTxt").textContent = peeking ? shown(v) : shown(v).replace(/[A-Z]/g, "M");
   $("cDec").classList.toggle("blur", !peeking);
   const left = att.peeks[v.qi];
   $("cPeekLeft").textContent = peeking ? `Peeking… ${Math.ceil((peekUntil-Date.now())/1000)} s` : `${left} peek${left===1?"":"s"} left for this paragraph`;
@@ -751,15 +770,15 @@ function cipherNav(){
   $("cNext").textContent = cur===n-1 ? "Done ▶" : "Next ▶";
   $("grid").innerHTML = VIEW.map((v,i)=>`<button class="${Object.keys(att.answers[v.qi]).length?"ans":""}${i===cur?" cur":""}" data-i="${i}">${i+1}</button>`).join("");
   $("grid").querySelectorAll("button").forEach(b => b.onclick = () => { stopPeek(); cur=+b.dataset.i; render(); });
-  $("exProg").textContent = `Paragraphs complete: ${n - blank.size} of ${n}`;
+  $("exProg").textContent = `Paragraphs started: ${n - blank.size} of ${n}`;
 }
 function stopPeek(){ peekUntil = 0; clearInterval(peekTimer); }
 $("bPeek").onclick = () => {
   const v = VIEW[cur]; if(att.peeks[v.qi] <= 0 || Date.now() < peekUntil) return;
   att.peeks[v.qi]--; ls.set(K.active, att);
   peekUntil = Date.now() + (EXAM.peekSeconds || 10) * 1000;
-  clearInterval(peekTimer); peekTimer = setInterval(() => { drawDecoded(); if(Date.now() >= peekUntil) stopPeek(); }, 250);
-  drawDecoded();
+  clearInterval(peekTimer); peekTimer = setInterval(() => { drawCipher(); if(Date.now() >= peekUntil){ stopPeek(); drawCipher(); } }, 250);
+  drawCipher();
 };
 $("cPrev").onclick = () => { if(cur>0){ stopPeek(); cur--; render(); } };
 $("cNext").onclick = () => { stopPeek(); if(cur<VIEW.length-1){ cur++; render(); } else $("bSubmit").scrollIntoView({behavior:"smooth"}); };
@@ -767,7 +786,7 @@ function cipherAnswers(){   // bank paragraph no., this student's extra shift, l
   if(!VIEW) return "";
   return BANKDATA.sets[att.setIndex].items.map((_,qi) => {
     const m = att.answers[qi] || {};
-    return `P${qi+1}[+${att.cs[qi]}, peeks used ${(EXAM.peeks ?? 3) - att.peeks[qi]}]: ` + Object.keys(m).sort().map(c => c + m[c].toLowerCase()).join(" ");
+    return `P${qi+1}[+${att.cs[qi]}, clue ${att.clue && att.clue[qi] ? "solved" : "not solved"}, peeks used ${(EXAM.peeks ?? 3) - att.peeks[qi]}]: ` + Object.keys(m).sort().map(c => c + m[c].toLowerCase()).join(" ");
   }).join(" | ");
 }
 async function finishCipher(auto){
