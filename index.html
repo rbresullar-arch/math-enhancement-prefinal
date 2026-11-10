@@ -602,7 +602,8 @@ $("bCode").onclick = async () => {
     const n = BANKDATA.sets[si].items.length;
     att.answers = Array.from({length:n}, () => ({}));
     att.peeks = Array(n).fill(EXAM.peeks ?? 3);
-    att.cs = Array.from({length:n}, () => 1 + crypto.getRandomValues(new Uint32Array(1))[0] % 25);
+    const rnd25 = () => 1 + crypto.getRandomValues(new Uint32Array(1))[0] % 25;
+    att.cs = BANKDATA.sets[si].items.map(x => { let k = rnd25(); while(k === x.nz) k = rnd25(); return k; });   // nz: extra shift that would cancel the cipher (total shift 0)
     if(EXAM.shuffle) att.qo = perm(n);
   }
   else if(EXAM.shuffle){ const raw = BANKDATA.sets[si].items; att.qo = perm(raw.length); att.oo = raw.map(x => perm(x.o.length)); }

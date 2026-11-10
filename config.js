@@ -141,7 +141,7 @@ const EXAMS = [
     title: "Math in the Modern World — Final Examination",
     topic: "Coding Theory and Cryptography · Caesar cipher · decode 5 paragraphs",
     info: "5 paragraphs · 1 point per correct letter · 60 minutes",
-    bank: "exams/mmw-cipher-exam.v3.enc.js",
+    bank: "exams/mmw-cipher-exam.v4.enc.js",
     minutes: 60,
     shuffle: true,
     peeks: 3,
@@ -177,6 +177,7 @@ const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
+  { v: "3.2", date: "2026-11-10", notes: ["Math in the Modern World — Final Examination: a paragraph can never end up with a shift of 0 (unencrypted)."] },
   { v: "3.1", date: "2026-11-10", notes: ["Math in the Modern World — Final Examination: new clue definitions; no instructions on the clue."] },
   { v: "3.0", date: "2026-11-10", notes: ["Math in the Modern World — Final Examination: clue word before each paragraph; the encrypted paragraph is blurred and opened with peeks; entries stay hidden."] },
   { v: "2.9", date: "2026-11-10", notes: ["Math in the Modern World — Final Examination (cryptography): decode 5 Caesar-cipher paragraphs, 3 peeks each, scored by correct letters."] },
