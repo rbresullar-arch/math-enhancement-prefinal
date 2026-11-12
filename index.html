@@ -269,7 +269,7 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
       </div>
       <button id="bEnter" class="btn full" style="margin-top:10px">Enter letter</button>
       <div id="cMsg" class="cmsg"></div>
-      <p class="muted">Entries are hidden after you enter them. To change one, enter the same cipher letter again.</p>
+      <p class="muted">Your entered letters appear in the paragraph in pink. To change one, enter the same cipher letter again.</p>
     </div>
     <div class="nav"><button id="cPrev" class="btn2">◀ Back</button><button id="cNext" class="btn">Next ▶</button></div>
   </div>
@@ -743,12 +743,15 @@ function enterLetter(){   // ballot style: the entry is saved and never shown ag
   if(!/^[A-Z]$/.test(p)) return cMsg("Type one real letter (A–Z).", true);
   m[c] = p; ls.set(K.active, att);
   $("cIn").value = ""; $("pIn").value = ""; $("cIn").focus();
-  cMsg("Entry saved."); cipherNav();
+  cMsg("Entry saved."); drawCipher(); cipherNav();
 }
 $("bEnter").onclick = enterLetter;
 $("cIn").addEventListener("input", () => { if($("cIn").value) $("pIn").focus(); });
 $("pIn").addEventListener("keydown", e => { if(e.key === "Enter") enterLetter(); });
-function drawCipher(){ $("cDecTxt").textContent = shown(VIEW[cur]); }
+function drawCipher(){   // entered letters replace their cipher letters (pink lowercase); letters not yet entered stay as cipher
+  const v = VIEW[cur], m = att.answers[v.qi];
+  $("cDecTxt").innerHTML = shown(v).split("").map(ch => /[A-Z]/.test(ch) && m[ch] ? `<span class="s">${m[ch].toLowerCase()}</span>` : esc(ch)).join("");
+}
 function cipherNav(){
   const n = VIEW.length, blank = new Set(cipherBlank());
   $("cPrev").disabled = cur===0;
