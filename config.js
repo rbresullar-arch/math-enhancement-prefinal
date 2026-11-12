@@ -140,7 +140,7 @@ const EXAMS = [
     mode: "cipher",
     title: "Math in the Modern World — Final Examination",
     topic: "Coding Theory and Cryptography · Caesar cipher · decode 5 paragraphs",
-    info: "5 paragraphs · 1 point per correct letter · 60 minutes",
+    info: "5 paragraphs · score = % of letters correct · 60 minutes",
     bank: "exams/mmw-cipher-exam.v5.enc.js",
     minutes: 60,
     shuffle: true,
@@ -149,7 +149,7 @@ const EXAMS = [
       "Each paragraph is encrypted with a Caesar cipher. Every paragraph has its own shift.",
       "Each paragraph has an encrypted clue word with its definition. Use it to find the shift; the boxes under the clue are for your own notes (not checked).",
       "Enter your answer one letter at a time (cipher letter → real letter). Entered letters appear in the paragraph.",
-      "You will not be told whether a paragraph is solved. Your score is the number of correct letters.",
+      "You will not be told whether a paragraph is solved. Your score is the percentage of letters you decode correctly.",
       "No alteration of answers allowed. Once submitted, answers can no longer be changed.",
       "Cheating/coaching deemed by the proctor will forfeit your entry for the examination.",
       "Keep the exam page open. Do not refresh, close, or switch to other apps or browser tabs."
@@ -174,6 +174,7 @@ const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
+  { v: "3.8", date: "2026-11-12", notes: ["Math in the Modern World — Final Examination: score shown as a percentage."] },
   { v: "3.7", date: "2026-11-12", notes: ["Math in the Modern World — Final Examination: entered letters now appear in the paragraph."] },
   { v: "3.6", date: "2026-11-10", notes: ["Math in the Modern World — Final Examination: attempts started on an older version open correctly."] },
   { v: "3.5", date: "2026-11-10", notes: ["Math in the Modern World — Final Examination: no blur or peeks; clue words now come from the Cipher Decoder activity, a different one per paragraph."] },

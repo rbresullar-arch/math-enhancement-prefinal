@@ -422,7 +422,7 @@ async function goHome(){
     const pill = d ? `<span class="pill ok">Submitted ✓</span>` : have ? `<span class="pill ok">Available offline ✓</span>` : DL.has(e.id) ? `<span class="pill">Downloading…</span>` : `<span class="pill warn">Not downloaded</span>`;
     el.innerHTML = `<div class="bar"><h2>${esc(e.title)}</h2>${pill}</div>
       <p class="muted">${esc(e.topic)} · ${esc(e.info)}</p>
-      ${d ? `<p>Your score: <b>${d.score} / ${d.total}</b></p>` : `<div class="actions">
+      ${d ? `<p>Your score: <b>${e.mode === "cipher" ? Math.round(d.score/d.total*1000)/10 + "%" : `${d.score} / ${d.total}`}</b></p>` : `<div class="actions">
         ${have || DL.has(e.id) ? "" : `<button class="btn2" data-dl>Download</button>`}
         <button class="btn" data-go>Take ${kindOf(e)}</button></div>`}`;
     const dl = el.querySelector("[data-dl]"), go = el.querySelector("[data-go]");
@@ -627,7 +627,7 @@ function toReady(){
   const it = BANKDATA.sets[att.setIndex].items, P = EXAM.points;
   const total = isCipher() ? it.reduce((s,x)=>s+x.c.replace(/[^A-Z]/g,"").length,0) : it.reduce((s,x)=>s+(P[x.type]||1),0);
   $("readyTitle").textContent = EXAM.title;
-  $("readyItems").textContent = isCipher() ? `${it.length} paragraphs · ${total} letters (1 point each)` : `${it.length} items · ${total} points`;
+  $("readyItems").textContent = isCipher() ? `${it.length} paragraphs · score = % of letters correct` : `${it.length} items · ${total} points`;
   $("bPractice").classList.toggle("hidden", isCipher());
   $("readyTime").textContent = att.expires ? `${fmtLeft(att.expires-Date.now())} (until ${fmtTime(new Date(att.expires))})` : "No limit";
   show("sReady");
@@ -794,7 +794,7 @@ async function finishCipher(auto){
   enqueue(rec);
   const done = ls.get(K.done, {}); done[nkey(att.exam,att.name)] = {score, total, at:att.ended}; ls.set(K.done, done);
   ls.del(K.active);
-  $("rScore").textContent = `${score} / ${total}`;
+  $("rScore").textContent = `${Math.round(score/total*1000)/10}%`;   // cipher exam: percentage of correct letters
   $("rName").textContent = att.name; $("rExam").textContent = att.examTitle; $("rSet").textContent = att.setName;
   $("rDate").textContent = rec.date; $("rT1").textContent = rec.timeStarted; $("rT2").textContent = rec.timeEnded + (auto ? " (time up)" : "");
   renderReview([]);
