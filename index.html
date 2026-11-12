@@ -219,6 +219,15 @@ ol.rules{margin:10px 0 0;padding-left:1.3em;font-size:.95rem}
     <button id="bCode" class="btn full">Start</button>
     <button id="bCodeBack" class="btn2 full" style="margin-top:10px">Back</button>
   </div>
+  <div id="resumeBox" class="card hidden">
+    <h2 style="margin-top:0">Continue previous answers?</h2>
+    <p id="resumeInfo"></p>
+    <label for="fResumeMin">Extra time (minutes)</label>
+    <input id="fResumeMin" type="number" min="1" max="180" value="15" inputmode="numeric">
+    <div id="resumeErr" class="err"></div>
+    <button id="bResume" class="btn full">Continue with these answers</button>
+    <button id="bResumeNew" class="btn2 full" style="margin-top:10px">Start a new attempt instead</button>
+  </div>
 </section>
 
 <!-- 4. READY -->
@@ -422,7 +431,7 @@ async function goHome(){
     const pill = d ? `<span class="pill ok">Submitted ✓</span>` : have ? `<span class="pill ok">Available offline ✓</span>` : DL.has(e.id) ? `<span class="pill">Downloading…</span>` : `<span class="pill warn">Not downloaded</span>`;
     el.innerHTML = `<div class="bar"><h2>${esc(e.title)}</h2>${pill}</div>
       <p class="muted">${esc(e.topic)} · ${esc(e.info)}</p>
-      ${d ? `<p>Your score: <b>${e.mode === "cipher" ? Math.round(d.score/d.total*1000)/10 + "%" : `${d.score} / ${d.total}`}</b></p>` : `<div class="actions">
+      ${d ? `<p>Your score: <b>${e.mode === "cipher" ? Math.round(d.score/d.total*1000)/10 + "%" : `${d.score} / ${d.total}`}</b></p>${e.mode === "cipher" ? `<button class="link" data-go style="font-size:.85rem">Teacher: reopen with extra time</button>` : ""}` : `<div class="actions">
         ${have || DL.has(e.id) ? "" : `<button class="btn2" data-dl>Download</button>`}
         <button class="btn" data-go>Take ${kindOf(e)}</button></div>`}`;
     const dl = el.querySelector("[data-dl]"), go = el.querySelector("[data-go]");
@@ -519,8 +528,47 @@ function loadBank(e){
 }
 
 /* ---------- 3. code ---------- */
+let RESUME = null, resumeSkip = false;
+async function lastResult(exam, name){   // newest submitted result for this name + exam: this phone's upload queue first, then the server
+  const mine = ls.get(K.queue, []).filter(r => r.exam === exam.title && nkey(exam.id, r.name) === nkey(exam.id, name) && String(r.status||"").startsWith("Submitted"));
+  if(mine.length) return mine[mine.length - 1];
+  if(!navigator.onLine || !API_URL.startsWith("https://")) return null;
+  try{
+    const ctl = new AbortController(); setTimeout(() => ctl.abort(), 10000);
+    const j = await (await fetch(`${API_URL}?action=last&exam=${encodeURIComponent(exam.title)}&name=${encodeURIComponent(name)}`, {signal:ctl.signal})).json();
+    return j && j.ok && j.row ? j.row : null;
+  }catch(x){ return null; }
+}
+function restoreCipher(prev, minutes, online, why){   // rebuild the attempt (shifts, order, clue words, notes, letters) from a recorded result
+  const items = BANKDATA.sets[0].items, n = items.length;
+  const r = { answers: Array.from({length:n}, () => ({})), cs: Array(n).fill(0), clueIdx: Array(n).fill(0), clueIn: {}, qo: [] };
+  for(const part of String(prev.answers).split(" | ")){
+    const m = part.match(/^P(\d+)\[\+(\d+)(?:, clue ([A-Z]+)(?: "([^"]*)")?)?[^\]]*\]:\s*(.*)$/);
+    if(!m) continue;
+    const qi = +m[1] - 1; if(qi < 0 || qi >= n) continue;
+    r.cs[qi] = +m[2];
+    const ci = m[3] ? BANKDATA.clues.findIndex(c => c[0] === m[3]) : -1; r.clueIdx[qi] = ci >= 0 ? ci : qi % BANKDATA.clues.length;
+    if(m[4] !== undefined) r.clueIn[qi] = m[4].split("").map(x => x === "_" ? "" : x);
+    for(const t of m[5].trim().split(/\s+/)) if(/^[A-Z][a-z]$/.test(t)) r.answers[qi][t[0]] = t[1].toUpperCase();
+  }
+  for(const t of String(prev.order || "").split(/\s+/)){ const m = t.match(/^P(\d+)→#(\d+)$/); if(m) r.qo[+m[2]-1] = +m[1]-1; }
+  if(r.qo.length !== n || r.qo.some(x => x === undefined) || new Set(r.qo).size !== n) r.qo = items.map((_,i) => i);
+  if(r.cs.some(k => !k)) return null;   // could not read every paragraph's shift
+  const now = Date.now();
+  att = { id:uid(), exam:EXAM.id, examTitle:EXAM.title, name:NAME, code:prev.code && why ? prev.code : "Master", online, expires: now + minutes*60000,
+          setIndex:0, setName:BANKDATA.sets[0].name, answers:r.answers, cs:r.cs, qo:r.qo, clueIdx:r.clueIdx, clueIn:r.clueIn,
+          started:now, flags:[`${fmtTime(new Date(now))} ${why || "reopened by teacher"} (+${minutes} min, continues ${prev.id || "previous attempt"})`], resumedFrom: prev.id || "" };
+  return att;
+}
+$("bResume").onclick = () => {
+  const min = Math.round(+$("fResumeMin").value);
+  if(!(min >= 1 && min <= 180)){ $("resumeErr").textContent = "Type the extra minutes (1–180)."; return; }
+  if(!restoreCipher(RESUME.prev, min, RESUME.online)){ $("resumeErr").textContent = "Could not read the previous answers. Start a new attempt instead."; return; }
+  ls.set(K.active, att); $("resumeBox").classList.add("hidden"); toReady();
+};
+$("bResumeNew").onclick = () => { $("resumeBox").classList.add("hidden"); resumeSkip = true; $("bCode").click(); };
 const noun = e => e && e.kind === "quiz" ? "quiz" : "exam";
-function openCode(e){ EXAM = e; $("codeLabel").textContent = noun(e) === "quiz" ? "Quiz Code" : "Exam Code"; document.querySelectorAll(".nn").forEach(x => x.textContent = noun(e)); document.querySelectorAll(".NN").forEach(x => x.textContent = noun(e) === "quiz" ? "Quiz" : "Exam"); $("codeTitle").textContent = e.title; $("codeTopic").textContent = e.topic; $("fCode").value=""; $("codeErr").textContent="";
+function openCode(e){ EXAM = e; $("codeLabel").textContent = noun(e) === "quiz" ? "Quiz Code" : "Exam Code"; document.querySelectorAll(".nn").forEach(x => x.textContent = noun(e)); document.querySelectorAll(".NN").forEach(x => x.textContent = noun(e) === "quiz" ? "Quiz" : "Exam"); $("codeTitle").textContent = e.title; $("codeTopic").textContent = e.topic; $("fCode").value=""; $("codeErr").textContent=""; $("resumeBox").classList.add("hidden"); resumeSkip = false;
   $("codeNote").textContent = `The code works for ${fmtMin(examMin(e))} after it is first used. You can take this ${e.kind === "quiz" ? "quiz" : "exam"} only once.`; show("sCode"); }
 $("bCodeBack").onclick = goHome;
 const wrapKey = async (bank, code, use) => {
@@ -568,12 +616,23 @@ $("bCode").onclick = async () => {
   if(!u && await fetchWraps()) u = await unwrap(bank, code, EXAM.id);   // a code just made by the teacher
   if(!u) return fail(`Wrong ${noun(EXAM)} code. Ask your teacher.`);
   const master = u.label === "Master";
-  const done = ls.get(K.done, {});
-  if(done[nkey(EXAM.id,NAME)] && !master) return fail(`You already took this ${noun(EXAM)}.`);
 
   // resume an unfinished attempt (same exam + name)
   const act = ls.get(K.active, null);
   if(act && act.exam===EXAM.id && act.name===NAME){ BANKDATA = u.data; att = act; b.disabled=false; b.textContent="Start"; return toReady(); }
+
+  // extension (config "reopen"): students who used that code and ran out of time continue their answers with extra minutes, once
+  const ro = EXAM.reopen;
+  if(ro && EXAM.mode === "cipher" && u.label === ro.code && Date.now() < Date.parse(ro.until)){
+    const prev = await lastResult(EXAM, NAME);
+    if(prev && prev.code === ro.code && /time up/i.test(prev.status || "") && !/reopened/i.test(prev.flagDetails || "")){
+      BANKDATA = u.data;
+      if(restoreCipher(prev, ro.minutes, true, `reopened with ${ro.code} extension`)){ ls.set(K.active, att); b.disabled=false; b.textContent="Start"; return toReady(); }
+    }
+  }
+
+  const done = ls.get(K.done, {});
+  if(done[nkey(EXAM.id,NAME)] && !master) return fail(`You already took this ${noun(EXAM)}.`);
 
   // code time window: server first (online), else this device
   const codes = ls.get(K.codes, {}), ck = EXAM.id+"|"+u.label;
@@ -589,6 +648,18 @@ $("bCode").onclick = async () => {
     ls.set(K.codes, codes);
     if(Date.now() >= expires) return fail("This code has expired. Ask your teacher.");
   } else { const s = await serverCheck(code); online = !!(s && s.ok); }
+
+  // teacher (master code) on a cipher exam: offer to reopen the student's submitted answers with extra time
+  if(master && EXAM.mode === "cipher" && !resumeSkip){
+    const prev = await lastResult(EXAM, NAME);
+    if(prev && /^P\d+\[/.test(prev.answers || "")){
+      BANKDATA = u.data; RESUME = {prev, online};
+      $("resumeInfo").innerHTML = `Found <b>${esc(NAME)}</b>'s submitted answers (${esc(prev.status || "Submitted")}${prev.timeEnded ? ", " + esc(prev.timeEnded) : ""}${prev.percent !== undefined && prev.percent !== "" ? ", score " + esc(String(prev.percent)) + "%" : ""}).`;
+      $("resumeErr").textContent = ""; $("resumeBox").classList.remove("hidden");
+      b.disabled = false; b.textContent = "Start"; return;
+    }
+  }
+  resumeSkip = false; $("resumeBox").classList.add("hidden");
 
   BANKDATA = u.data;
   const si = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 2**32 * BANKDATA.sets.length);

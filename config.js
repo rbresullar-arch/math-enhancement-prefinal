@@ -136,6 +136,7 @@ const EXAMS = [
   },
   {
     id: "mmw-cipher-exam",
+    reopen: { code: "Code 1", minutes: 15, until: "2026-11-12T18:00:00+08:00" },   // CX33BGN students who ran out of time may continue once
     subject: "mmw",
     mode: "cipher",
     title: "Math in the Modern World — Final Examination",
@@ -174,6 +175,7 @@ const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
+  { v: "3.9", date: "2026-11-12", notes: ["Math in the Modern World — Final Examination: students who ran out of time on code CX33BGN can continue their answers with extra time (once).", "The teacher can also reopen a submitted exam with the master code."] },
   { v: "3.8", date: "2026-11-12", notes: ["Math in the Modern World — Final Examination: score shown as a percentage."] },
   { v: "3.7", date: "2026-11-12", notes: ["Math in the Modern World — Final Examination: entered letters now appear in the paragraph."] },
   { v: "3.6", date: "2026-11-10", notes: ["Math in the Modern World — Final Examination: attempts started on an older version open correctly."] },
