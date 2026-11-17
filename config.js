@@ -154,6 +154,25 @@ const EXAMS = [
       "Cheating/coaching deemed by the proctor will forfeit your entry for the examination.",
       "Keep the exam page open. Do not refresh, close, or switch to other apps or browser tabs."
     ]
+  },
+  {
+    id: "mmw-bsme-final",
+    subject: "mmw",
+    title: "Math in the Modern World — BSME Final Examination",
+    topic: "Module VIII: Coding Theory and Cryptography · Module IX: Linear Programming · Module X: Mathematical Systems",
+    info: "40 items · 40 points · 60 minutes · Sets A–D",
+    bank: "exams/mmw-bsme-final.enc.js",
+    minutes: 60,
+    shuffle: true,
+    points: { "Coding Theory and Cryptography": 1, "Linear Programming": 1, "Mathematical Systems": 1 },
+    rules: [
+      "Read each item carefully and tap the letter of the best answer. Only one answer is correct.",
+      "No alteration of answers allowed. Once submitted, answers can no longer be changed.",
+      "Cheating/coaching deemed by the proctor will forfeit your entry for the examination.",
+      "Keep the exam page open. Do not refresh, close, or switch to other apps or browser tabs.",
+      "The proctor will handle your questions. Raise your hand, say “Excuse me, ma’am/sir”.",
+      "No borrowing of calculators allowed. Use your own scientific calculator."
+    ]
   }
 ];
 
@@ -174,6 +193,7 @@ const CODE_MINUTES = 90;
 
 // Version history shown at the bottom of the home page (newest first)
 const VERSIONS = [
+  { v: "4.0", date: "2026-11-18", notes: ["Math in the Modern World — BSME Final Examination (Modules VIII–X, 40 items, Sets A–D)."] },
   { v: "3.9", date: "2026-11-12", notes: ["Math in the Modern World — Final Examination: reopen support added (not in use)."] },
   { v: "3.8", date: "2026-11-12", notes: ["Math in the Modern World — Final Examination: score shown as a percentage."] },
   { v: "3.7", date: "2026-11-12", notes: ["Math in the Modern World — Final Examination: entered letters now appear in the paragraph."] },
